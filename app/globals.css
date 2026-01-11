@@ -75,3 +75,13 @@ body {
   background: "#EFEEE7";
   color: #000000;
 }
+
+@keyframes menu-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+

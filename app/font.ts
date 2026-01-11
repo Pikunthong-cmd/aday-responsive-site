@@ -1,7 +1,33 @@
-import { IBM_Plex_Sans_Thai } from 'next/font/google'
+import localFont from "next/font/local";
 
-export const ibmPlexSansThai = IBM_Plex_Sans_Thai({
-  subsets: ['thai', 'latin'],
-  weight: ['100', '200', '300', '400', '500', '600', '700'],
-  display: 'swap',
-})
+export const lineSeedSansTH = localFont({
+  src: [
+    {
+      path: "../public/fonts/line-seed/LINESeedSansTH_Th.ttf",
+      weight: "100",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/line-seed/LINESeedSansTH_Rg.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/line-seed/LINESeedSansTH_Bd.ttf",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/line-seed/LINESeedSansTH_XBd.ttf",
+      weight: "800",
+      style: "normal",
+    },
+    {
+      path: "../public/fonts/line-seed/LINESeedSansTH_He.ttf",
+      weight: "900",
+      style: "normal",
+    },
+  ],
+  display: "swap",
+  variable: "--font-line-seed",
+});

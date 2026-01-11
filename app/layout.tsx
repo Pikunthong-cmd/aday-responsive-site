@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
-import { ibmPlexSansThai } from "./font";
+import { lineSeedSansTH } from "./font";
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,7 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={ibmPlexSansThai.className}>
+      <body className={lineSeedSansTH.className}>
         <Header />
         <main>{children}</main>
       </body>
