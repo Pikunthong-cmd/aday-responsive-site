@@ -5,6 +5,58 @@
   --foreground: #171717;
 }
 
+/* Display */
+.display-1 {
+  font-size: 80px;
+  font-size: 5.000rem;
+}
+
+.display-2 {
+  font-size: 60px;
+  font-size: 3.812rem;
+}
+
+.display-3 {
+  font-size: 47px;
+  font-size: 2.938rem;
+}
+
+/* Headings */
+.h1 {
+  font-size: 32px;
+  font-size: 2rem;
+}
+
+.h2 {
+  font-size: 24px;
+  font-size: 1.5rem;
+}
+
+.h3 {
+  font-size: 20px; 
+  font-size: 1.250rem;
+}
+
+.title {
+  font-size: 18px;
+  font-size: 1.125rem;
+}
+
+.subtitle {
+  font-size: 16px;
+  font-size: 1.000rem;
+}
+
+.body {
+  font-size: 14px;   
+  font-size: 0.875rem;
+}
+
+.caption {
+  font-size: 13px; 
+  font-size: 0.812rem;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -20,7 +72,6 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: "#EFEEE7";
+  color: #000000;
 }
