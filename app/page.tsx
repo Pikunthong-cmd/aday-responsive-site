@@ -1,5 +1,6 @@
 
 import Category from "@/components/home/Category";
+import Event from "@/components/home/Event";
 import Experimental from "@/components/home/Experimental";
 import Hero from "@/components/home/Hero";
 import ImageStripSlider from "@/components/home/ImageStripSlider";
@@ -13,6 +14,7 @@ export default function Home() {
       <MagazineType />
       <Experimental />
       <Category />
+      <Event />
     </div>
   );
 }
