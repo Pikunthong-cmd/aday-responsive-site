@@ -57,6 +57,17 @@
   font-size: 0.812rem;
 }
 
+.img-hero-mag{
+  margin-bottom: -5px;
+}
+
+.page-paper {
+  background-image: 
+    radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 3px 3px;
+}
+
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
