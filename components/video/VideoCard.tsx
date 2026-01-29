@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { VideoItem } from "./types";
-import { cn } from "@/src/lib/utils";
+import { cn } from "@/src/utils/utils";
 
 type Props = {
   item: VideoItem;
