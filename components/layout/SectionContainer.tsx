@@ -1,4 +1,4 @@
-import { cn } from "@/app/lib/utils";
+import { cn } from "@/src/lib/utils";
 
 interface SectionContainerProps {
   children: React.ReactNode;

@@ -120,10 +120,10 @@ export default function MagazineBookReader({
                     className: "flipbook",
                     style: {},
                     startPage: 0,
-                    flippingTime: 780, // ✅ นิ่มขึ้นนิด (เดิม 900)
+                    flippingTime: 780, 
                     usePortrait: isMobile,
                     drawShadow: true,
-                    maxShadowOpacity: 0.6, // ✅ ลดเงาหนัก ๆ ที่ทำให้หน้าเดี่ยวกระตุก
+                    maxShadowOpacity: 0.6, 
                     showCover: true,
                     mobileScrollSupport: true,
                     clickEventForward: true,
@@ -156,7 +156,6 @@ export default function MagazineBookReader({
                               priority={i <= 2}
                             />
                           ) : (
-                            // ✅ blank page (ช่วยให้หน้าสุดท้าย/หน้าแรก flip smooth)
                             <div className="w-full h-full bg-[#fbfaf5]" />
                           )}
                         </div>
