@@ -25,9 +25,25 @@ export default function Experimental({
     <section className="w-full my-5">
       {/* HERO VIDEO */}
       {bannerVideo ? (
-        <a href={href} className="block w-full" aria-label="Open banner link">
+        <a
+          href={href}
+          className="block w-full"
+          aria-label="Open banner link"
+          onMouseEnter={() => {
+            const el = document.querySelector(
+              "[data-watch-cursor]",
+            ) as HTMLElement | null;
+            el?.setAttribute("data-active", "true");
+          }}
+          onMouseLeave={() => {
+            const el = document.querySelector(
+              "[data-watch-cursor]",
+            ) as HTMLElement | null;
+            el?.removeAttribute("data-active");
+          }}
+        >
           <video
-            className="w-full h-auto object-cover"
+            className="w-full h-auto object-cover cursor-none"
             autoPlay
             muted
             loop

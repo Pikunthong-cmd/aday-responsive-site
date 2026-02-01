@@ -16,32 +16,6 @@ type SpineItem = {
 export default function KonsanpokPage() {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [q, setQ] = useState("");
-  const [dataKonsonpok, setDataKonsonpok] = useState<any>(null);
-
-  useEffect(() => {
-      let mounted = true;
-  
-      (async () => {
-        try {
-          console.log("Fetching...");
-          const [resKonsonpok] = await Promise.all([
-            konsonpokAPI.getAll(),
-          ]);
-  
-          console.log("resKonsonpok:", resKonsonpok);
-  
-          if (!mounted) return;
-  
-          setDataKonsonpok(resKonsonpok);
-        } catch (e) {
-          console.error("Failed to load home", e);
-        }
-      })();
-  
-      return () => {
-        mounted = false;
-      };
-    }, []);
 
   const items = useMemo<SpineItem[]>(
     () => [

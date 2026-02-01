@@ -67,6 +67,10 @@
   background-size: 3px 3px;
 }
 
+[data-watch-cursor][data-active="true"] {
+  opacity: 1;
+}
+
 
 @theme inline {
   --color-background: var(--background);
