@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function Event() {
   return (
     <section className="w-full">
-      <div className="xl:p-40 px-6">
+      <div className="xl:p-40 p-20">
         <div className="w-full justify-center flex mb-10">
           <svg
             width="205"

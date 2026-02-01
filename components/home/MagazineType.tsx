@@ -11,12 +11,12 @@ const items: Item[] = [
   {
     title: "main course",
     image: "/images/magazine-type-01.png",
-    href: "/magazine/art-design",
+    href: "/tag/maincourse",
   },
   {
     title: "wake up",
     image: "/images/magazine-type-02.png",
-    href: "/magazine/life",
+    href: "/tag/wake-up",
   },
 ];
 

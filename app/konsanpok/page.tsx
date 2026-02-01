@@ -1,11 +1,11 @@
-// app/konsanpok/page.tsx
 "use client";
 
 import KonsanpokFeatureSection from "@/components/konsanpok/KonsanpokFeatureSection";
 import SectionContainer from "@/components/layout/SectionContainer";
+import { konsonpokAPI } from "@/src/api/konsonpok";
 import Image from "next/image";
 import Link from "next/link";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type SpineItem = {
   id: string;
@@ -16,6 +16,32 @@ type SpineItem = {
 export default function KonsanpokPage() {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [q, setQ] = useState("");
+  const [dataKonsonpok, setDataKonsonpok] = useState<any>(null);
+
+  useEffect(() => {
+      let mounted = true;
+  
+      (async () => {
+        try {
+          console.log("Fetching...");
+          const [resKonsonpok] = await Promise.all([
+            konsonpokAPI.getAll(),
+          ]);
+  
+          console.log("resKonsonpok:", resKonsonpok);
+  
+          if (!mounted) return;
+  
+          setDataKonsonpok(resKonsonpok);
+        } catch (e) {
+          console.error("Failed to load home", e);
+        }
+      })();
+  
+      return () => {
+        mounted = false;
+      };
+    }, []);
 
   const items = useMemo<SpineItem[]>(
     () => [

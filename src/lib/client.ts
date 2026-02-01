@@ -71,6 +71,16 @@ export const adayApiClient = createAdayApiClient(
   10000
 );
 
+export const adayApiClientV1 = createAdayApiClient(
+  process.env.NEXT_PUBLIC_ADAY_API_URL_V1,
+  10000
+);
+
+export const adayApiClientV2 = createAdayApiClient(
+  process.env.NEXT_PUBLIC_ADAY_API_URL_V2,
+  10000
+);
+
 // aday jsreport
 export const adayJsReportClient = createAdayApiClient(
   process.env.NEXT_PUBLIC_ADAY_JSREPORT_URL,
