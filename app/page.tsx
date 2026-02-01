@@ -18,6 +18,8 @@ import { homeAPI } from "@/src/api/home";
 import { postsAPI } from "@/src/api/posts";
 import { mapRelatedToCards, VideoHomeApiPost, VideoHomeCard } from "@/src/lib/postsVideoHomeHelpers";
 import { buildCategoryCardsFromMenu } from "@/src/lib/categoryMenuHelpers";
+import { EventCard, EventHomePost, EventTag, findEventTagId, mapRelatedToEventCards } from "@/src/lib/eventHomeHelpers";
+import { tagsAPI } from "@/src/api/tags";
 
 type BannerVideoResponse = {
   bannerVideo: string;
@@ -30,6 +32,7 @@ export default function Home() {
   const [loadingMenu, setLoadingMenu] = useState(true);
   const [videoCards, setVideoCards] = useState<VideoHomeCard[]>([]);
   const [menu, setMenu] = useState<MenuResponse | null>(null);
+  const [eventItems, setEventItems] = useState<EventCard[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -156,6 +159,38 @@ export default function Home() {
     return sortByOrder(mapped).slice(0, 10);
   }, [dataMenu]);
 
+  useEffect(() => {
+    let mounted = true;
+
+    (async () => {
+      try {
+        // 1) หา tagId ของ event
+        const tags = (await tagsAPI.getEvent()) as EventTag[];
+        const tagId = findEventTagId(tags);
+
+        if (!tagId) {
+          console.warn("Event tag not found");
+          return;
+        }
+
+        // 2) ดึง posts ตาม tagId
+        const posts = (await postsAPI.getEventHome(tagId)) as EventHomePost[];
+
+        // 3) ใช้ related[] มาเป็น 3 การ์ด
+        const cards = mapRelatedToEventCards(posts, 3);
+
+        if (!mounted) return;
+        setEventItems(cards);
+      } catch (e) {
+        console.error("Failed to load event section", e);
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <div className="bg-[#EFEEE7]">
       {/* HERO */}
@@ -183,7 +218,7 @@ export default function Home() {
         videoCards={videoCards}
       />
       <Category items={categoryCards} />
-      <Event />
+      <Event items={eventItems} />
     </div>
   );
 }

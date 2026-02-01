@@ -1,10 +1,16 @@
-import Image from "next/image";
+import Link from "next/link";
+import type { EventCard } from "@/src/lib/eventHomeHelpers";
 
-export default function Event() {
+type Props = {
+  items: EventCard[];
+};
+
+export default function Event({ items }: Props) {
   return (
     <section className="w-full">
-      <div className="xl:p-40 p-20">
+      <div className="xl:p-40 p-6">
         <div className="w-full justify-center flex mb-10">
+          {/* SVG เดิมของคุณ */}
           <svg
             width="205"
             height="47"
@@ -20,58 +26,33 @@ export default function Event() {
         </div>
 
         <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              image: "/images/event-1.png",
-              place: "Agenda",
-              title: "Design Perspectives x Golden Pin Salon Bangkok 2025",
-              subject: "a team",
-            },
-            {
-              image: "/images/event-2.png",
-              place: "Agenda",
-              title:
-                "BITEC BURI เปิดตัวโครงการน้องใหม่ “SAMA Garden” พื้นที่สีเขียวฮีลใจคนเมือง Green Lifestyle Centre ครบจบ",
-              subject: "a day",
-            },
-            {
-              image: "/images/event-3.png",
-              place: "Founder",
-              title:
-                "‘House of Mask & Mime’ กลุ่มละครที่ไม่ได้มีแค่หน้ากากและละครใบ้ แต่คือโชว์อะไรก็ได้ที่ไม่พูด!",
-              subject: "สมรภูมิ จันทร์นาคา",
-            },
-          ].map((item, index) => (
-            <div key={index} className="group cursor-pointer">
+          {items.map((item) => (
+            <Link key={item.id} href={item.href} className="group cursor-pointer">
               {/* Image */}
-              <div className="relative overflow-hidden aspect-[3/4]">
-                <Image
+              <div className="relative overflow-hidden aspect-[3/4] bg-black/10">
+                <img
                   src={item.image}
                   alt={item.title}
-                  fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                  loading="lazy"
                 />
 
-                {/* hover overlay (เบา ๆ) */}
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
               </div>
 
               {/* Text under image */}
               <div className="mt-4 space-y-2 transition-all duration-300 group-hover:translate-y-[-2px]">
-                {/* Place */}
-                <p className="text-xs tracking-widest ">{item.place}</p>
+                <p className="text-xs tracking-widest">{item.place}</p>
 
-                {/* Title */}
                 <p className="text-base font-bold leading-snug text-black line-clamp-2">
                   {item.title}
                 </p>
 
-                {/* Subject */}
                 <p className="text-xs tracking-widest text-gray-500">
                   เรื่อง {item.subject}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

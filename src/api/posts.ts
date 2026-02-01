@@ -10,4 +10,9 @@ export const postsAPI = {
     const res = await adayApiClientV2.get("/posts?per_page=3&page=1&categories=308&front=true");
     return res.data;
   },
+
+  getEventHome: async (tagId:any) => {
+    const res = await adayApiClientV2.get(`posts?tags=${tagId}&per_page=3&page=1`);
+    return res.data;
+  },
 };

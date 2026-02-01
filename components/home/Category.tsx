@@ -15,7 +15,7 @@ type Props = {
 export default function Category({ items }: Props) {
   return (
     <section className="w-full">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-1 py-20">
         {items.map((item, index) => (
           <Link
             key={`${item.category}-${index}`}
