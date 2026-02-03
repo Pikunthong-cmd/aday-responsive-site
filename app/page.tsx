@@ -61,8 +61,6 @@ export default function Home() {
 
         if (!mounted) return;
         setMenu(resMenu);
-
-        console.log("menu items:", resMenu?.items?.length ?? 0);
       } catch (e) {
         console.error("Failed to load menu", e);
       } finally {
@@ -87,8 +85,6 @@ export default function Home() {
         ]);
 
         if (!mounted) return;
-
-        console.log("banner video:", bannerRes);
         setBanner(bannerRes);
 
         const cards = mapRelatedToCards(postsRes, 3);

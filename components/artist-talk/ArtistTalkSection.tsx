@@ -5,6 +5,7 @@ import ArtistTalkCard from "../ArtistTalkCard";
 import ViewMoreButton from "../ViewMoreButton";
 import SectionContainer from "../layout/SectionContainer";
 import { artistTalkAPI } from "@/src/api/artist-talk";
+import { categoryFeedAPI } from "@/src/api/category-feed";
 
 type Props = {
   artistTalkId: number | null;
@@ -67,6 +68,22 @@ function mapToCardItems(raw: any[]): CardItem[] {
     .filter(Boolean) as CardItem[];
 }
 
+function CardSkeleton({ count }: { count: number }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="flex flex-col gap-3">
+          <div className="w-full bg-neutral-200 animate-pulse aspect-[3/2] lg:aspect-[4/3]" />
+          <div className="h-4 w-24 bg-neutral-200 animate-pulse mt-3" />
+          <div className="h-6 sm:h-7 w-5/6 bg-neutral-200 animate-pulse" />
+          <div className="h-6 sm:h-7 w-3/5 bg-neutral-200 animate-pulse" />
+          <div className="h-5 w-40 bg-neutral-200 animate-pulse" />
+        </div>
+      ))}
+    </>
+  );
+}
+
 export default function ArtistTalkSection({
   artistTalkId,
   categoriesRes,
@@ -100,7 +117,11 @@ export default function ArtistTalkSection({
 
     setLoading(true);
     try {
-      const res = await artistTalkAPI.getCategoriesById(artistTalkId, offset);
+      const res = await categoryFeedAPI.getPostsByCategoryId(
+        artistTalkId,
+        offset,
+        pageSize,
+      );
 
       const raw = normalizeArray(res);
       const mapped = mapToCardItems(raw);
@@ -108,7 +129,6 @@ export default function ArtistTalkSection({
       const unique = mapped.filter((x) => !idSet.has(x.id));
 
       setItems((prev) => [...prev, ...unique]);
-
       setOffset((prev) => prev + mapped.length);
 
       setIdSet((prev) => {
@@ -131,6 +151,8 @@ export default function ArtistTalkSection({
         {items.map((item, idx) => (
           <ArtistTalkCard key={item.id} {...item} index={idx} />
         ))}
+
+        {loading && <CardSkeleton count={pageSize} />}
       </div>
 
       {hasMore && (

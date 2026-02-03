@@ -23,8 +23,8 @@ export default function ViewMoreButton({ onClick, loading }: Props) {
         disabled:opacity-50 disabled:cursor-not-allowed
       "
     >
-      <span className="relative">
-        {loading ? "Loading..." : "View more"}
+      <span className="transition-opacity duration-200">
+        {loading ? "Loading more..." : "View more"}
       </span>
 
       <span

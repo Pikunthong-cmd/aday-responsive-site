@@ -1,11 +1,11 @@
 import Image from "next/image";
-import { IconTextArttistTalk } from "../Icon";
 
 type HeroCategoryProps = {
   imageSrc: string;
+  title: string;
 };
 
-export default function HeroCategory({ imageSrc }: HeroCategoryProps) {
+export default function HeroCategory({ imageSrc, title }: HeroCategoryProps) {
   return (
     <section className="relative w-full overflow-hidden">
       <div
@@ -19,18 +19,30 @@ export default function HeroCategory({ imageSrc }: HeroCategoryProps) {
           max-h-[520px]
         "
       >
-        {/* Background image */}
         <Image
           src={imageSrc}
-          alt="Hero background"
+          alt={title}
           fill
           priority
           className="object-cover"
         />
 
-        {/* Center logo / text */}
         <div className="absolute inset-0 z-10 flex items-center justify-center px-6">
-          <IconTextArttistTalk />
+          <h1
+            className="
+              text-white
+              font-extrabold
+              text-center
+              tracking-wide
+              text-4xl
+              sm:text-5xl
+              md:text-6xl
+              lg:text-7xl
+              xl:text-8xl
+            "
+          >
+            {title}
+          </h1>
         </div>
       </div>
     </section>
