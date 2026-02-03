@@ -12,6 +12,7 @@ interface Props {
   subtitle: string;
   link: string;
   index?: number;
+  categoryName?: string;
 }
 
 function useInView<T extends HTMLElement>() {
@@ -47,6 +48,7 @@ export default function ArtistTalkCard({
   width,
   height,
   index = 0,
+  categoryName,
 }: Props) {
   const imgW = typeof width === "number" && width > 0 ? width : 1200;
   const imgH = typeof height === "number" && height > 0 ? height : 800;
@@ -79,7 +81,7 @@ export default function ArtistTalkCard({
         />
 
         <span className="block text-[#FE552C] text-xs sm:text-sm font-medium mt-3">
-          Artist Talk
+          {categoryName}
         </span>
 
         <h2

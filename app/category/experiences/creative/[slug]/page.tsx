@@ -47,6 +47,7 @@ export default async function CreativeCategoryPage({
         categoriesRes={initialPosts}
         initialOffset={0}
         pageSize={PAGE_SIZE}
+        categoryName = {categoryName}
       />
     </div>
   );

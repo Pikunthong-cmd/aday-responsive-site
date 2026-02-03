@@ -12,6 +12,7 @@ type Props = {
   categoriesRes: any;
   initialOffset: number;
   pageSize?: number;
+  categoryName? : any;
 };
 
 type CardItem = {
@@ -23,6 +24,7 @@ type CardItem = {
   subtitle: string;
   link: string;
   highlight?: boolean;
+  categoryName?:string;
 };
 
 function stripHtml(input: string) {
@@ -89,6 +91,7 @@ export default function ArtistTalkSection({
   categoriesRes,
   initialOffset,
   pageSize = 8,
+  categoryName,
 }: Props) {
   const [items, setItems] = useState<CardItem[]>([]);
   const [offset, setOffset] = useState(initialOffset);
@@ -149,7 +152,7 @@ export default function ArtistTalkSection({
     <SectionContainer className="py-20" padded>
       <div className="grid gap-12 grid-cols-1 lg:grid-cols-2">
         {items.map((item, idx) => (
-          <ArtistTalkCard key={item.id} {...item} index={idx} />
+          <ArtistTalkCard key={item.id} {...item} index={idx} categoryName={categoryName} />
         ))}
 
         {loading && <CardSkeleton count={pageSize} />}
