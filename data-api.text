@@ -1,0 +1,400 @@
+[
+    {
+        "id": 14365,
+        "count": 117,
+        "description": "",
+        "link": "https://m1.khunbaw.dev/category/experiences/creative/artist-talk/",
+        "name": "Artist Talk",
+        "slug": "artist-talk",
+        "taxonomy": "category",
+        "parent": 14358,
+        "meta": [],
+        "acf": [],
+        "head_tags": [
+            {
+                "tag": "meta",
+                "attributes": {
+                    "name": "robots",
+                    "content": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+                }
+            },
+            {
+                "tag": "title",
+                "content": "Artist Talk » a day magazine"
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "name": "robots",
+                    "content": "index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+                }
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "canonical",
+                    "href": "https://m1.khunbaw.dev/category/experiences/creative/artist-talk/"
+                }
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "next",
+                    "href": "https://m1.khunbaw.dev/category/experiences/creative/artist-talk/page/2/"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:locale",
+                    "content": "en_US"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:type",
+                    "content": "article"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:title",
+                    "content": "Artist Talk » a day magazine"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:url",
+                    "content": "https://m1.khunbaw.dev/category/experiences/creative/artist-talk/"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:site_name",
+                    "content": "a day magazine"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:image",
+                    "content": "https://m1.khunbaw.dev/wp-content/uploads/2018/08/Type-H-facebook-12.jpg"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:image:width",
+                    "content": "1200"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:image:height",
+                    "content": "628"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "property": "og:image:type",
+                    "content": "image/jpeg"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "name": "twitter:card",
+                    "content": "summary_large_image"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "name": "twitter:site",
+                    "content": "@adaymagazine"
+                }
+            },
+            {
+                "tag": "script",
+                "attributes": {
+                    "type": "application/ld+json",
+                    "class": "yoast-schema-graph"
+                },
+                "content": "{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"CollectionPage\",\"@id\":\"https://m1.khunbaw.dev/category/experiences/creative/artist-talk/\",\"url\":\"https://m1.khunbaw.dev/category/experiences/creative/artist-talk/\",\"name\":\"Artist Talk &raquo; a day magazine\",\"isPartOf\":{\"@id\":\"https://m1.khunbaw.dev/#website\"},\"primaryImageOfPage\":{\"@id\":\"https://m1.khunbaw.dev/category/experiences/creative/artist-talk/#primaryimage\"},\"image\":{\"@id\":\"https://m1.khunbaw.dev/category/experiences/creative/artist-talk/#primaryimage\"},\"thumbnailUrl\":\"https://m1.khunbaw.dev/wp-content/uploads/2025/10/Web-Featured-Image-13.jpg\",\"breadcrumb\":{\"@id\":\"https://m1.khunbaw.dev/category/experiences/creative/artist-talk/#breadcrumb\"},\"inLanguage\":\"en-US\"},{\"@type\":\"ImageObject\",\"inLanguage\":\"en-US\",\"@id\":\"https://m1.khunbaw.dev/category/experiences/creative/artist-talk/#primaryimage\",\"url\":\"https://m1.khunbaw.dev/wp-content/uploads/2025/10/Web-Featured-Image-13.jpg\",\"contentUrl\":\"https://m1.khunbaw.dev/wp-content/uploads/2025/10/Web-Featured-Image-13.jpg\",\"width\":2880,\"height\":1264},{\"@type\":\"BreadcrumbList\",\"@id\":\"https://m1.khunbaw.dev/category/experiences/creative/artist-talk/#breadcrumb\",\"itemListElement\":[{\"@type\":\"ListItem\",\"position\":1,\"name\":\"Home\",\"item\":\"https://m1.khunbaw.dev/\"},{\"@type\":\"ListItem\",\"position\":2,\"name\":\"EXPERIENCES\",\"item\":\"https://m1.khunbaw.dev/category/experiences/\"},{\"@type\":\"ListItem\",\"position\":3,\"name\":\"Creativity\",\"item\":\"https://m1.khunbaw.dev/category/experiences/creative/\"},{\"@type\":\"ListItem\",\"position\":4,\"name\":\"Artist Talk\"}]},{\"@type\":\"WebSite\",\"@id\":\"https://m1.khunbaw.dev/#website\",\"url\":\"https://m1.khunbaw.dev/\",\"name\":\"a day magazine\",\"description\":\"for all things creative\",\"potentialAction\":[{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https://m1.khunbaw.dev/?s={search_term_string}\"},\"query-input\":\"required name=search_term_string\"}],\"inLanguage\":\"en-US\"}]}"
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "dns-prefetch",
+                    "href": "//m1.khunbaw.dev"
+                }
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "alternate",
+                    "type": "application/rss+xml",
+                    "title": "a day magazine » Feed",
+                    "href": "https://m1.khunbaw.dev/feed/"
+                }
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "alternate",
+                    "type": "application/rss+xml",
+                    "title": "a day magazine » Comments Feed",
+                    "href": "https://m1.khunbaw.dev/comments/feed/"
+                }
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "alternate",
+                    "type": "application/rss+xml",
+                    "title": "a day magazine » Artist Talk Category Feed",
+                    "href": "https://m1.khunbaw.dev/category/experiences/creative/artist-talk/feed/"
+                }
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "https://api.w.org/",
+                    "href": "https://m1.khunbaw.dev/wp-json/"
+                }
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "alternate",
+                    "title": "JSON",
+                    "type": "application/json",
+                    "href": "https://m1.khunbaw.dev/wp-json/wp/v2/categories/14365"
+                }
+            },
+            {
+                "tag": "link",
+                "attributes": {
+                    "rel": "EditURI",
+                    "type": "application/rsd+xml",
+                    "title": "RSD",
+                    "href": "https://m1.khunbaw.dev/xmlrpc.php?rsd"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "name": "generator",
+                    "content": "WordPress 6.6"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "name": "generator",
+                    "content": "Site Kit by Google 1.103.0"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "name": "google-adsense-platform-account",
+                    "content": "ca-host-pub-2644536267352236"
+                }
+            },
+            {
+                "tag": "meta",
+                "attributes": {
+                    "name": "google-adsense-platform-domain",
+                    "content": "sitekit.withgoogle.com"
+                }
+            }
+        ],
+        "template": "column",
+        "nuxtlink": "/category/experiences/creative/artist-talk/",
+        "opengraph_image": {
+            "url": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-1.jpg",
+            "width": 360,
+            "height": 200
+        },
+        "featured_image": {
+            "sizes": {
+                "thumbnail": {
+                    "id": 122264,
+                    "width": 150,
+                    "height": 150,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-1-150x150.jpg"
+                },
+                "medium": {
+                    "id": 122264,
+                    "width": 300,
+                    "height": 167,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-1-300x167.jpg"
+                },
+                "medium_large": {
+                    "id": 122264,
+                    "width": 360,
+                    "height": 200,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-1.jpg"
+                },
+                "large": {
+                    "id": 122264,
+                    "width": 360,
+                    "height": 200,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-1.jpg"
+                },
+                "1536x1536": {
+                    "id": 122264,
+                    "width": 360,
+                    "height": 200,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-1.jpg"
+                },
+                "2048x2048": {
+                    "id": 122264,
+                    "width": 360,
+                    "height": 200,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-1.jpg"
+                },
+                "full": {
+                    "id": 122264,
+                    "width": 360,
+                    "height": 200,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-1.jpg"
+                }
+            }
+        },
+        "column_image": {
+            "sizes": {
+                "thumbnail": {
+                    "id": 122265,
+                    "width": 150,
+                    "height": 150,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-2-150x150.jpg"
+                },
+                "medium": {
+                    "id": 122265,
+                    "width": 300,
+                    "height": 56,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-2-300x56.jpg"
+                },
+                "medium_large": {
+                    "id": 122265,
+                    "width": 768,
+                    "height": 144,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-2-768x144.jpg"
+                },
+                "large": {
+                    "id": 122265,
+                    "width": 1024,
+                    "height": 192,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-2-1024x192.jpg"
+                },
+                "1536x1536": {
+                    "id": 122265,
+                    "width": 1536,
+                    "height": 288,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-2.jpg"
+                },
+                "2048x2048": {
+                    "id": 122265,
+                    "width": 1920,
+                    "height": 360,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-2.jpg"
+                },
+                "full": {
+                    "id": 122265,
+                    "width": 1920,
+                    "height": 360,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2021/02/Artists-Talk-2.jpg"
+                }
+            }
+        },
+        "logo_image": {
+            "sizes": {
+                "thumbnail": {
+                    "id": 170706,
+                    "width": 400,
+                    "height": 155,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2023/09/artist-talk-logo-for-web.svg"
+                },
+                "medium": {
+                    "id": 170706,
+                    "width": 400,
+                    "height": 155,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2023/09/artist-talk-logo-for-web.svg"
+                },
+                "medium_large": {
+                    "id": 170706,
+                    "width": 400,
+                    "height": 155,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2023/09/artist-talk-logo-for-web.svg"
+                },
+                "large": {
+                    "id": 170706,
+                    "width": 400,
+                    "height": 155,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2023/09/artist-talk-logo-for-web.svg"
+                },
+                "1536x1536": {
+                    "id": 170706,
+                    "width": 400,
+                    "height": 155,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2023/09/artist-talk-logo-for-web.svg"
+                },
+                "2048x2048": {
+                    "id": 170706,
+                    "width": 400,
+                    "height": 155,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2023/09/artist-talk-logo-for-web.svg"
+                },
+                "full": {
+                    "id": 170706,
+                    "width": 400,
+                    "height": 155,
+                    "src": "https://m1.khunbaw.dev/wp-content/uploads/2023/09/artist-talk-logo-for-web.svg"
+                }
+            }
+        },
+        "_links": {
+            "self": [
+                {
+                    "href": "https://m1.khunbaw.dev/wp-json/wp/v2/categories/14365"
+                }
+            ],
+            "collection": [
+                {
+                    "href": "https://m1.khunbaw.dev/wp-json/wp/v2/categories"
+                }
+            ],
+            "about": [
+                {
+                    "href": "https://m1.khunbaw.dev/wp-json/wp/v2/taxonomies/category"
+                }
+            ],
+            "up": [
+                {
+                    "embeddable": true,
+                    "href": "https://m1.khunbaw.dev/wp-json/wp/v2/categories/14358"
+                }
+            ],
+            "wp:post_type": [
+                {
+                    "href": "https://m1.khunbaw.dev/wp-json/wp/v2/posts?categories=14365"
+                }
+            ],
+            "curies": [
+                {
+                    "name": "wp",
+                    "href": "https://api.w.org/{rel}",
+                    "templated": true
+                }
+            ]
+        }
+    }
+]

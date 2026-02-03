@@ -1,67 +1,104 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState, useMemo } from "react";
 
 interface Props {
   image: string;
+  width?: number;
+  height?: number;
   title: string;
   subtitle: string;
-  highlight?: boolean;
+  link: string;
+  index?: number;
+}
+
+function useInView<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          io.disconnect(); // trigger once
+        }
+      },
+      { threshold: 0.15 },
+    );
+
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return { ref, inView };
 }
 
 export default function ArtistTalkCard({
   image,
   title,
   subtitle,
-  highlight = false,
+  link,
+  width,
+  height,
+  index = 0,
 }: Props) {
+  const imgW = typeof width === "number" && width > 0 ? width : 1200;
+  const imgH = typeof height === "number" && height > 0 ? height : 800;
+
+  const { ref, inView } = useInView<HTMLElement>();
+
+  const delayStyle = useMemo(
+    () => ({ transitionDelay: `${Math.min(index * 80, 400)}ms` }),
+    [index],
+  );
+
   return (
     <article
-      className="
-        group
-        flex flex-col
-        gap-3
-      "
+      ref={ref}
+      style={delayStyle}
+      className={`
+        group flex flex-col gap-3
+        transition-all duration-700 ease-out
+        ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
+      `}
     >
-      {/* IMAGE */}
-      <div
-        className={`
-          relative
-          overflow-hidden
-        `}
-      >
+      <Link href={link} className="block">
         <Image
           src={image}
           alt={title}
-          width={600}
-          height={800}
+          width={imgW}
+          height={imgH}
           unoptimized
-          className="
-            w-full
-            h-auto
-            object-cover
-          "
+          className="w-full h-auto"
         />
-      </div>
 
-      {/* META */}
-      <span
-        className="
-          title
+        <span className="block text-[#FE552C] text-xs sm:text-sm font-medium mt-3">
+          Artist Talk
+        </span>
+
+        <h2
+          className="
+          font-bold
+          text-base sm:text-lg md:text-xl lg:text-2xl
+          leading-snug
+          transition-colors
+          duration-700
+          group-hover:text-[#FE552C]
         "
-      >
-        Artist Talk
-      </span>
+        >
+          {title}
+        </h2>
 
-      {/* TITLE */}
-      <h2
-        className="
-          h3 font-bold
-        "
-      >
-        {title}
-      </h2>
-
-      {/* SUBTITLE */}
-      <p className="title">{subtitle}</p>
+        <p className="text-sm sm:text-base text-neutral-700 font-light">
+          {subtitle}
+        </p>
+      </Link>
     </article>
   );
 }

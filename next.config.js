@@ -2,6 +2,14 @@
 const nextConfig = {
   images: {
     remotePatterns: [
+      // adaymagazine (prod)
+      {
+        protocol: "https",
+        hostname: "adaymagazine.com",
+        pathname: "/wp-content/uploads/**",
+      },
+
+      // khunbaw dev / staging
       {
         protocol: "https",
         hostname: "m1.khunbaw.dev",

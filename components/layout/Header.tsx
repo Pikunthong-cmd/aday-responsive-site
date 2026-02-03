@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { IconMenu, IconSearch } from "./Icon";
-import FullScreenMenu from "./FullScreenMenu";
 import Link from "next/link";
-import SectionContainer from "./layout/SectionContainer";
+import SectionContainer from "./SectionContainer";
+import { IconMenu, IconSearch } from "../Icon";
+import FullScreenMenu from "../FullScreenMenu";
+
 
 export default function Header() {
   const [open, setOpen] = useState(false);

@@ -12,7 +12,7 @@ const getCookie = (name: string): string | null => {
 
 const createAdayApiClient = (
   baseURL?: string,
-  timeout = 10000
+  timeout = 15000
 ): AxiosInstance => {
   const client = axios.create({
     baseURL,
@@ -68,27 +68,27 @@ const createAdayApiClient = (
 // aday main API
 export const adayApiClient = createAdayApiClient(
   process.env.NEXT_PUBLIC_ADAY_API_URL,
-  10000
+  15000
 );
 
 export const adayApiClientV1 = createAdayApiClient(
   process.env.NEXT_PUBLIC_ADAY_API_URL_V1,
-  10000
+  15000
 );
 
 export const adayApiClientV2 = createAdayApiClient(
   process.env.NEXT_PUBLIC_ADAY_API_URL_V2,
-  10000
+  15000
 );
 
 // aday jsreport
 export const adayJsReportClient = createAdayApiClient(
   process.env.NEXT_PUBLIC_ADAY_JSREPORT_URL,
-  100000
+  150000
 );
 
 // aday auth
 export const adayAuthClient = createAdayApiClient(
   process.env.NEXT_PUBLIC_ADAY_AUTH_API_URL,
-  10000
+  15000
 );

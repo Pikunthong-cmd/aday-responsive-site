@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Header from "@/components/Header";
+
 import { lineSeedSansTH } from "./font";
 import Footer from "@/components/Footer";
 import WatchCursor from "@/components/ui/WatchCursor";
+import Header from "@/components/layout/Header";
 
 
 export const metadata: Metadata = {

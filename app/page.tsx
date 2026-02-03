@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+
 import Category from "@/components/home/Category";
 import Event from "@/components/home/Event";
 import Experimental from "@/components/home/Experimental";
 import Hero, { HeroSlide } from "@/components/home/Hero";
 import MagazineType from "@/components/home/MagazineType";
+
 import { menuAPI } from "@/src/api/menu";
+import { homeAPI } from "@/src/api/home";
+import { postsAPI } from "@/src/api/posts";
+import { tagsAPI } from "@/src/api/tags";
 
 import {
   MenuResponse,
@@ -14,12 +19,22 @@ import {
   findRootCategoryTitle,
   sortByOrder,
 } from "@/src/lib/menuHelpers";
-import { homeAPI } from "@/src/api/home";
-import { postsAPI } from "@/src/api/posts";
-import { mapRelatedToCards, VideoHomeApiPost, VideoHomeCard } from "@/src/lib/postsVideoHomeHelpers";
+
+import {
+  mapRelatedToCards,
+  VideoHomeApiPost,
+  VideoHomeCard,
+} from "@/src/lib/postsVideoHomeHelpers";
+
 import { buildCategoryCardsFromMenu } from "@/src/lib/categoryMenuHelpers";
-import { EventCard, EventHomePost, EventTag, findEventTagId, mapRelatedToEventCards } from "@/src/lib/eventHomeHelpers";
-import { tagsAPI } from "@/src/api/tags";
+
+import {
+  EventCard,
+  EventHomePost,
+  EventTag,
+  findEventTagId,
+  mapRelatedToEventCards,
+} from "@/src/lib/eventHomeHelpers";
 
 type BannerVideoResponse = {
   bannerVideo: string;
@@ -27,26 +42,27 @@ type BannerVideoResponse = {
 };
 
 export default function Home() {
-  const [dataMenu, setDataMenu] = useState<MenuResponse | null>(null);
-  const [banner, setBanner] = useState<BannerVideoResponse | null>(null);
-  const [loadingMenu, setLoadingMenu] = useState(true);
-  const [videoCards, setVideoCards] = useState<VideoHomeCard[]>([]);
   const [menu, setMenu] = useState<MenuResponse | null>(null);
+  const [banner, setBanner] = useState<BannerVideoResponse | null>(null);
+
+  const [videoCards, setVideoCards] = useState<VideoHomeCard[]>([]);
   const [eventItems, setEventItems] = useState<EventCard[]>([]);
 
+  const [loadingMenu, setLoadingMenu] = useState(true);
+
+  // Load menu (used by Hero + Category)
   useEffect(() => {
     let mounted = true;
 
     (async () => {
       try {
         setLoadingMenu(true);
-
         const resMenu = (await menuAPI.getAll()) as MenuResponse;
 
         if (!mounted) return;
-        setDataMenu(resMenu);
+        setMenu(resMenu);
 
-        console.log("menu items:", resMenu?.items?.length);
+        console.log("menu items:", resMenu?.items?.length ?? 0);
       } catch (e) {
         console.error("Failed to load menu", e);
       } finally {
@@ -59,26 +75,7 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      try {
-        const res = (await homeAPI.getAllBanerVideo()) as BannerVideoResponse;
-        if (!mounted) return;
-
-        console.log("banner video:", res);
-        setBanner(res);
-      } catch (e) {
-        console.error("Failed to load banner video", e);
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
+  // Load banner video + video home cards
   useEffect(() => {
     let mounted = true;
 
@@ -91,6 +88,7 @@ export default function Home() {
 
         if (!mounted) return;
 
+        console.log("banner video:", bannerRes);
         setBanner(bannerRes);
 
         const cards = mapRelatedToCards(postsRes, 3);
@@ -105,66 +103,12 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = (await menuAPI.getAll()) as MenuResponse;
-        if (!mounted) return;
-        setMenu(res);
-      } catch (e) {
-        console.error("Failed to load menu", e);
-      }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const categoryCards = useMemo(() => {
-    return buildCategoryCardsFromMenu(menu);
-  }, [menu]);
-
-  /**
-   * สร้าง slides จาก menu:
-   * - ต้อง important === true
-   * - ต้องมี banner_image (string)
-   * - category = root title (เช่น ART & DESIGN)
-   * - tag = title ของ item (เช่น Artist Talk)  -> ปรับได้ภายหลัง
-   */
-  const slides: HeroSlide[] = useMemo(() => {
-    if (!dataMenu?.items?.length) return [];
-
-    const tree = dataMenu.items;
-    const flat = flattenMenu(tree);
-
-    const importantItems = flat
-      .filter((i) => i.important === true)
-      .filter((i) => typeof i.banner_image === "string" && i.banner_image);
-
-    const mapped: (HeroSlide & { order?: number })[] = importantItems.map(
-      (item) => {
-        const category = findRootCategoryTitle(item, tree);
-
-        return {
-          image: item.banner_image as string,
-          category: category || "Featured",
-          title: item.title, 
-          tag: item.title, 
-          order: item.order,
-        };
-      }
-    );
-
-    return sortByOrder(mapped).slice(0, 10);
-  }, [dataMenu]);
-
+  // Load event cards
   useEffect(() => {
     let mounted = true;
 
     (async () => {
       try {
-        // 1) หา tagId ของ event
         const tags = (await tagsAPI.getEvent()) as EventTag[];
         const tagId = findEventTagId(tags);
 
@@ -173,10 +117,7 @@ export default function Home() {
           return;
         }
 
-        // 2) ดึง posts ตาม tagId
         const posts = (await postsAPI.getEventHome(tagId)) as EventHomePost[];
-
-        // 3) ใช้ related[] มาเป็น 3 การ์ด
         const cards = mapRelatedToEventCards(posts, 3);
 
         if (!mounted) return;
@@ -191,10 +132,50 @@ export default function Home() {
     };
   }, []);
 
+  const categoryCards = useMemo(() => {
+    return buildCategoryCardsFromMenu(menu);
+  }, [menu]);
+
+  /**
+   * Build slides from menu:
+   * - important === true
+   * - has banner_image
+   * - category = root title (e.g. ART & DESIGN)
+   * - tag = item.title (adjust later)
+   */
+  const slides: HeroSlide[] = useMemo(() => {
+    if (!menu?.items?.length) return [];
+
+    const tree = menu.items;
+    const flat = flattenMenu(tree);
+
+    const importantItems = flat
+      .filter((i) => i.important === true)
+      .filter((i) => typeof i.banner_image === "string" && i.banner_image);
+
+    const mapped: (HeroSlide & { order?: number })[] = importantItems.map(
+      (item) => {
+        const category = findRootCategoryTitle(item, tree);
+
+        return {
+          image: item.banner_image as string,
+          category: category || "Featured",
+          title: item.title,
+          tag: item.title,
+          order: item.order,
+        };
+      }
+    );
+
+    return sortByOrder(mapped).slice(0, 10);
+  }, [menu]);
+
+  const loadingHero = loadingMenu;
+
   return (
     <div className="bg-[#EFEEE7]">
       {/* HERO */}
-      {loadingMenu ? (
+      {loadingHero ? (
         <div className="h-[70vh] w-full bg-black/10" />
       ) : slides.length > 0 ? (
         <Hero slides={slides} />
@@ -212,11 +193,13 @@ export default function Home() {
       )}
 
       <MagazineType />
+
       <Experimental
         bannerVideo={banner?.bannerVideo}
         linkUrl={banner?.linkUrl}
         videoCards={videoCards}
       />
+
       <Category items={categoryCards} />
       <Event items={eventItems} />
     </div>
