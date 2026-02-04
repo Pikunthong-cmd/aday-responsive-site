@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import { useMemo, useRef } from "react";
-import { IconArrowNext, IconArrowPrev, IconTextRelated } from "./Icon";
-import SectionContainer from "./layout/SectionContainer";
+import SectionContainer from "../layout/SectionContainer";
+import { IconArrowNext, IconArrowPrev, IconTextRelated } from "../Icon";
 
 export default function RelatedPosts() {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
