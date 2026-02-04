@@ -1,4 +1,3 @@
-
 export type MenuItem = {
   id: number;
   order?: number;
@@ -15,6 +14,8 @@ export type MenuItem = {
 export type MenuResponse = {
   items: MenuItem[];
 };
+
+export const pickHref = (item: MenuItem) => item.nuxtlink || item.url || "";
 
 export function sortByOrder<T extends { order?: number }>(arr: T[]) {
   return [...arr].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -53,4 +54,35 @@ export function findRootCategoryTitle(item: MenuItem, tree: MenuItem[]): string 
   }
 
   return current?.title ?? "";
+}
+
+// ✅ รองรับ response จาก API ได้ทั้ง array และ {items:[]}
+export function normalizeMenuResponse(data: any): MenuResponse {
+  if (Array.isArray(data)) return { items: data };
+  if (Array.isArray(data?.items)) return data as MenuResponse;
+  return { items: [] };
+}
+
+// ✅ flatten แบบเอา leaf เท่านั้น (ตัวไม่มี children) + กันซ้ำ + เรียง order
+export function flattenLeaves(nodes: MenuItem[]): MenuItem[] {
+  const out: MenuItem[] = [];
+  const seen = new Set<number>();
+
+  const walk = (items: MenuItem[]) => {
+    for (const it of sortByOrder(items)) {
+      const hasChildren = !!it.children?.length;
+
+      if (hasChildren) {
+        walk(it.children!);
+      } else {
+        if (!seen.has(it.id)) {
+          seen.add(it.id);
+          out.push(it);
+        }
+      }
+    }
+  };
+
+  walk(nodes);
+  return out;
 }

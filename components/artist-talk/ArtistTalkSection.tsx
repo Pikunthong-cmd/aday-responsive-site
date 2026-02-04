@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import ArtistTalkCard from "../ArtistTalkCard";
+import { useEffect, useMemo, useState } from "react";
 import ViewMoreButton from "../ViewMoreButton";
 import SectionContainer from "../layout/SectionContainer";
-import { artistTalkAPI } from "@/src/api/artist-talk";
 import { categoryFeedAPI } from "@/src/api/category-feed";
+import ArtistTalkCard from "../ArtistTalkCard";
 
 type Props = {
   artistTalkId: number | null;
   categoriesRes: any;
   initialOffset: number;
   pageSize?: number;
-  categoryName? : any;
+  categoryName?: string;
 };
 
 type CardItem = {
@@ -23,8 +22,7 @@ type CardItem = {
   title: string;
   subtitle: string;
   link: string;
-  highlight?: boolean;
-  categoryName?:string;
+  categoryName?: string;
 };
 
 function stripHtml(input: string) {
@@ -37,20 +35,13 @@ function normalizeArray(res: any): any[] {
   return [];
 }
 
-function mapToCardItems(raw: any[]): CardItem[] {
+function mapToCardItems(raw: any[], categoryName?: string): CardItem[] {
   return raw
     .map((it) => {
       const id = it?.id;
       const image = it?.opengraph_image?.url || "";
-
-      const widthRaw = it?.opengraph_image?.width;
-      const heightRaw = it?.opengraph_image?.height;
-
-      const width =
-        typeof widthRaw === "number" ? widthRaw : parseInt(widthRaw, 10);
-      const height =
-        typeof heightRaw === "number" ? heightRaw : parseInt(heightRaw, 10);
-
+      const width = Number(it?.opengraph_image?.width);
+      const height = Number(it?.opengraph_image?.height);
       const title = stripHtml(it?.title?.rendered || "");
       const subtitle = it?.author_detail?.name || "";
       const link = it?.link || "";
@@ -65,7 +56,8 @@ function mapToCardItems(raw: any[]): CardItem[] {
         title,
         subtitle,
         link,
-      } as CardItem;
+        categoryName,
+      };
     })
     .filter(Boolean) as CardItem[];
 }
@@ -74,12 +66,11 @@ function CardSkeleton({ count }: { count: number }) {
   return (
     <>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex flex-col gap-3">
-          <div className="w-full bg-neutral-200 animate-pulse aspect-[3/2] lg:aspect-[4/3]" />
+        <div key={i} className="flex flex-col gap-3 mb-12">
+          <div className="w-full bg-neutral-200 animate-pulse aspect-[3/2]" />
           <div className="h-4 w-24 bg-neutral-200 animate-pulse mt-3" />
-          <div className="h-6 sm:h-7 w-5/6 bg-neutral-200 animate-pulse" />
-          <div className="h-6 sm:h-7 w-3/5 bg-neutral-200 animate-pulse" />
-          <div className="h-5 w-40 bg-neutral-200 animate-pulse" />
+          <div className="h-6 w-5/6 bg-neutral-200 animate-pulse" />
+          <div className="h-6 w-3/5 bg-neutral-200 animate-pulse" />
         </div>
       ))}
     </>
@@ -97,14 +88,11 @@ export default function ArtistTalkSection({
   const [offset, setOffset] = useState(initialOffset);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
   const [idSet, setIdSet] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const raw = normalizeArray(categoriesRes);
-    const mapped = mapToCardItems(raw);
-
-    if (mapped.length) mapped[0] = { ...mapped[0], highlight: true };
+    const mapped = mapToCardItems(raw, categoryName);
 
     setItems(mapped);
     setOffset(initialOffset + mapped.length);
@@ -113,7 +101,7 @@ export default function ArtistTalkSection({
     const next = new Set<number>();
     mapped.forEach((x) => next.add(x.id));
     setIdSet(next);
-  }, [categoriesRes, initialOffset, pageSize]);
+  }, [categoriesRes, initialOffset, pageSize, categoryName]);
 
   const loadMore = async () => {
     if (!artistTalkId || loading || !hasMore) return;
@@ -127,8 +115,7 @@ export default function ArtistTalkSection({
       );
 
       const raw = normalizeArray(res);
-      const mapped = mapToCardItems(raw);
-
+      const mapped = mapToCardItems(raw, categoryName);
       const unique = mapped.filter((x) => !idSet.has(x.id));
 
       setItems((prev) => [...prev, ...unique]);
@@ -141,21 +128,46 @@ export default function ArtistTalkSection({
       });
 
       if (mapped.length < pageSize) setHasMore(false);
-    } catch (e) {
-      console.error(e);
     } finally {
       setLoading(false);
     }
   };
 
+  const { leftItems, rightItems } = useMemo(() => {
+    const left: CardItem[] = [];
+    const right: CardItem[] = [];
+
+    items.forEach((item, index) => {
+      (index % 2 === 0 ? left : right).push(item);
+    });
+
+    return { leftItems: left, rightItems: right };
+  }, [items]);
+
   return (
     <SectionContainer className="py-20" padded>
-      <div className="grid gap-12 grid-cols-1 lg:grid-cols-2">
-        {items.map((item, idx) => (
-          <ArtistTalkCard key={item.id} {...item} index={idx} categoryName={categoryName} />
-        ))}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12">
+        <div className="flex flex-col">
+          {leftItems.map((item, idx) => (
+            <ArtistTalkCard
+              key={item.id}
+              {...item}
+              index={idx * 2}
+            />
+          ))}
+          {loading && <CardSkeleton count={Math.ceil(pageSize / 2)} />}
+        </div>
 
-        {loading && <CardSkeleton count={pageSize} />}
+        <div className="flex flex-col">
+          {rightItems.map((item, idx) => (
+            <ArtistTalkCard
+              key={item.id}
+              {...item}
+              index={idx * 2 + 1}
+            />
+          ))}
+          {loading && <CardSkeleton count={Math.floor(pageSize / 2)} />}
+        </div>
       </div>
 
       {hasMore && (

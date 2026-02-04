@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 import { lineSeedSansTH } from "./font";
-import Footer from "@/components/Footer";
+import Footer from "@/components/ui/Footer";
 import WatchCursor from "@/components/ui/WatchCursor";
 import Header from "@/components/layout/Header";
 

@@ -1,15 +1,19 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { IconCaretDown } from '../Icon'
+import Link from "next/link";
+
+type Item = {
+  label: string;
+  href: string;
+};
 
 type Props = {
-  label: string
-  items: { label: string; href: string }[]
-  isOpen: boolean
-  onToggle: () => void
-  onItemClick?: () => void
-}
+  label: string;
+  items: Item[];
+  isOpen: boolean;
+  onToggle: () => void;
+  onItemClick?: () => void;
+};
 
 export default function DropdownItem({
   label,
@@ -19,49 +23,47 @@ export default function DropdownItem({
   onItemClick,
 }: Props) {
   return (
-    <div className="w-full text-center">
-      {/* Header */}
+    <div className="w-full max-w-3xl flex flex-col items-center">
       <button
+        type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-center gap-2 h1 text-black cursor-pointer"
+        className={`cursor-pointer h1 inline-flex items-center gap-3 select-none transition-colors duration-300 ${
+          isOpen ? "text-[#FE552C]" : "text-black"
+        }`}
+        aria-expanded={isOpen}
       >
         <span>{label}</span>
-
-        {/* Icon */}
         <span
-          className={`
-            transition-transform duration-300
-            ${isOpen ? 'rotate-180' : ''}
-          `}
+          className={`text-xl transition-transform duration-300 ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+          aria-hidden="true"
         >
-          <IconCaretDown />
+          ▾
         </span>
       </button>
 
-      {/* Dropdown */}
       <div
-        className={`
-          overflow-hidden transition-all duration-300 ease-out
-          ${
-            isOpen
-              ? 'max-h-40 opacity-100 translate-y-0'
-              : 'max-h-0 opacity-0 -translate-y-2'
-          }
-        `}
+        className={`w-full grid transition-[grid-template-rows] duration-300 ease-out ${
+          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
       >
-        <div className="flex flex-col gap-2 pt-3 text-lg">
-          {items.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onItemClick}
-              className="hover:opacity-70 transition-opacity"
-            >
-              {item.label}
-            </Link>
-          ))}
+        <div className="overflow-hidden">
+          <div className="mt-4 flex flex-col items-center gap-4 pb-2">
+            {items.map((it) => (
+              <Link
+                key={`${it.href}-${it.label}`}
+                href={it.href}
+                onClick={onItemClick}
+                className="font-medium text-neutral-900/90 hover:text-[#FE552C] transition-all duration-200 hover:scale-[1.06] origin-center"
+              >
+                {it.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
+``
