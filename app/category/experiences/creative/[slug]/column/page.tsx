@@ -1,9 +1,9 @@
 import { columnMock } from "@/app/data/column.mock";
 import ColumnBodyLayout from "@/components/column/ColumnBodyLayout";
 import ColumnHeroCover from "@/components/column/ColumnHeroCover";
-import ColumnMetaBar from "@/components/column/ColumnMetaBar";
 import DetailsAndShare from "@/components/DetailsAndShare";
-import RelatedPosts from "@/components/RelatedPosts";
+import RelatedPosts from "@/components/ui/RelatedPosts";
+
 
 
 export default function ColumnPage() {
