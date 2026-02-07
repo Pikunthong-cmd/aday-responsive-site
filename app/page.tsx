@@ -41,24 +41,25 @@ type BannerVideoResponse = {
   linkUrl: string;
 };
 
+import HeroSkeleton from "@/components/home/skeletons/HeroSkeleton";
+// (เดี๋ยว component อื่นค่อยทำ skeleton ทีละตัว)
+
 export default function Home() {
   const [menu, setMenu] = useState<MenuResponse | null>(null);
   const [banner, setBanner] = useState<BannerVideoResponse | null>(null);
-
   const [videoCards, setVideoCards] = useState<VideoHomeCard[]>([]);
   const [eventItems, setEventItems] = useState<EventCard[]>([]);
 
   const [loadingMenu, setLoadingMenu] = useState(true);
+  const [loadingHomeSections, setLoadingHomeSections] = useState(true);
+  const [loadingEvents, setLoadingEvents] = useState(true);
 
-  // Load menu (used by Hero + Category)
   useEffect(() => {
     let mounted = true;
-
     (async () => {
       try {
         setLoadingMenu(true);
         const resMenu = (await menuAPI.getAll()) as MenuResponse;
-
         if (!mounted) return;
         setMenu(resMenu);
       } catch (e) {
@@ -67,81 +68,59 @@ export default function Home() {
         if (mounted) setLoadingMenu(false);
       }
     })();
-
     return () => {
       mounted = false;
     };
   }, []);
 
-  // Load banner video + video home cards
   useEffect(() => {
     let mounted = true;
-
     (async () => {
       try {
+        setLoadingHomeSections(true);
         const [bannerRes, postsRes] = await Promise.all([
           homeAPI.getAllBanerVideo() as Promise<BannerVideoResponse>,
           postsAPI.getVideoHome() as Promise<VideoHomeApiPost[]>,
         ]);
-
         if (!mounted) return;
         setBanner(bannerRes);
-
-        const cards = mapRelatedToCards(postsRes, 3);
-        setVideoCards(cards);
+        setVideoCards(mapRelatedToCards(postsRes, 3));
       } catch (e) {
         console.error("Failed to load home sections", e);
+      } finally {
+        if (mounted) setLoadingHomeSections(false);
       }
     })();
-
     return () => {
       mounted = false;
     };
   }, []);
 
-  // Load event cards
   useEffect(() => {
     let mounted = true;
-
     (async () => {
       try {
+        setLoadingEvents(true);
         const tags = (await tagsAPI.getEvent()) as EventTag[];
         const tagId = findEventTagId(tags);
-
-        if (!tagId) {
-          console.warn("Event tag not found");
-          return;
-        }
+        if (!tagId) return;
 
         const posts = (await postsAPI.getEventHome(tagId)) as EventHomePost[];
-        const cards = mapRelatedToEventCards(posts, 3);
-
         if (!mounted) return;
-        setEventItems(cards);
+        setEventItems(mapRelatedToEventCards(posts, 3));
       } catch (e) {
         console.error("Failed to load event section", e);
+      } finally {
+        if (mounted) setLoadingEvents(false);
       }
     })();
-
     return () => {
       mounted = false;
     };
   }, []);
 
-  const categoryCards = useMemo(() => {
-    return buildCategoryCardsFromMenu(menu);
-  }, [menu]);
-
-  /**
-   * Build slides from menu:
-   * - important === true
-   * - has banner_image
-   * - category = root title (e.g. ART & DESIGN)
-   * - tag = item.title (adjust later)
-   */
   const slides: HeroSlide[] = useMemo(() => {
     if (!menu?.items?.length) return [];
-
     const tree = menu.items;
     const flat = flattenMenu(tree);
 
@@ -150,29 +129,23 @@ export default function Home() {
       .filter((i) => typeof i.banner_image === "string" && i.banner_image);
 
     const mapped: (HeroSlide & { order?: number })[] = importantItems.map(
-      (item) => {
-        const category = findRootCategoryTitle(item, tree);
-
-        return {
-          image: item.banner_image as string,
-          category: category || "Featured",
-          title: item.title,
-          tag: item.title,
-          order: item.order,
-        };
-      }
+      (item) => ({
+        image: item.banner_image as string,
+        category: findRootCategoryTitle(item, tree) || "Featured",
+        title: item.title,
+        tag: item.title,
+        order: item.order,
+      })
     );
 
     return sortByOrder(mapped).slice(0, 10);
   }, [menu]);
 
-  const loadingHero = loadingMenu;
-
   return (
     <div className="bg-[#EFEEE7]">
       {/* HERO */}
-      {loadingHero ? (
-        <div className="h-[70vh] w-full bg-black/10" />
+      {loadingMenu ? (
+        <HeroSkeleton />
       ) : slides.length > 0 ? (
         <Hero slides={slides} />
       ) : (
@@ -190,14 +163,16 @@ export default function Home() {
 
       <MagazineType />
 
+      {/* Experimental / Category / Event เดี๋ยวค่อยทำ skeleton ทีละตัว */}
       <Experimental
         bannerVideo={banner?.bannerVideo}
         linkUrl={banner?.linkUrl}
         videoCards={videoCards}
       />
 
-      <Category items={categoryCards} />
+      <Category items={buildCategoryCardsFromMenu(menu)} />
       <Event items={eventItems} />
     </div>
   );
 }
+

@@ -8,6 +8,11 @@ const nextConfig = {
         hostname: "adaymagazine.com",
         pathname: "/wp-content/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "adaymagazine.com",
+        pathname: "/wp-content/themes/**",
+      },
 
       // khunbaw dev / staging
       {

@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
 import type { VideoItem } from "./types";
 import { cn } from "@/src/utils/utils";
 
@@ -7,8 +11,16 @@ type Props = {
   variant?: "featured" | "highlight";
 };
 
+const FALLBACK_IMAGE_SRC = "/images/no-image.png";
+
 export default function VideoCard({ item, variant = "highlight" }: Props) {
   const isFeatured = variant === "featured";
+
+  const [imgSrc, setImgSrc] = useState<string>(item.image || FALLBACK_IMAGE_SRC);
+
+  useEffect(() => {
+    setImgSrc(item.image || FALLBACK_IMAGE_SRC);
+  }, [item.image]);
 
   return (
     <article
@@ -18,8 +30,11 @@ export default function VideoCard({ item, variant = "highlight" }: Props) {
       )}
     >
       <img
-        src={"/images/hero.png"}
+        src={imgSrc}
         alt={item.title}
+        onError={() => {
+          if (imgSrc !== FALLBACK_IMAGE_SRC) setImgSrc(FALLBACK_IMAGE_SRC);
+        }}
         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
       />
 
@@ -29,12 +44,6 @@ export default function VideoCard({ item, variant = "highlight" }: Props) {
       <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
-            {/* {item.badge ? (
-              <p className="mb-1 text-xs font-semibold tracking-wide text-[#FE552C]">
-                {item.badge}
-              </p>
-            ) : null} */}
-
             <h3
               className={cn(
                 "line-clamp-2 font-semibold text-white",
@@ -45,12 +54,10 @@ export default function VideoCard({ item, variant = "highlight" }: Props) {
             </h3>
 
             {item.description ? (
-              <h3 className="mt-1  text-[#FE552C] line-clamp-2 font-semibold">
+              <h3 className="mt-1 line-clamp-2 font-semibold text-[#FE552C]">
                 View All
               </h3>
             ) : null}
-
-            
 
             {item.dateLabel ? (
               <p className="mt-2 text-[11px] text-white/70">{item.dateLabel}</p>
@@ -59,7 +66,6 @@ export default function VideoCard({ item, variant = "highlight" }: Props) {
         </div>
       </div>
 
-      {/* Clickable (optional) */}
       <Link
         href={item.href ?? "#"}
         aria-label={item.title}

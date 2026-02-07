@@ -8,4 +8,5 @@ export type VideoItem = {
   thumbnailUrl: string;
   badge?: string; // เช่น "A Day HOW"
   ctaLabel?: string; // เช่น "View All"
+  image?:string
 };
