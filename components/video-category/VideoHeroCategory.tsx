@@ -1,27 +1,27 @@
-import Image from "next/image";
-import SectionContainer from "../layout/SectionContainer";
+"use client";
 
-export default function VideoHeroCategory() {
+import Image from "next/image";
+
+type Props = {
+  src?: string | null;
+};
+
+const FALLBACK = "/images/no-image.png"; 
+
+export default function VideoHeroCategory({ src }: Props) {
+  const finalSrc = src || FALLBACK;
   return (
-      <SectionContainer padded={false} fullWidth>
-        {/* Aspect control */}
-        <div
-          className="
-            relative w-full
-            aspect-square
-            lg:aspect-[1837/732]
-            max-h-[90vh]
-          "
-        >
-          {/* Background image */}
-          <Image
-            src="/images/artist-talk/hero.png"
-            alt="Hero background"
-            fill
-            priority
-            className="object-cover"
-          />
-        </div>
-      </SectionContainer>
-    );
+    <section className="relative w-full overflow-hidden">
+      <div className="relative w-full aspect-square lg:aspect-[1837/732] max-h-[90vh]">
+        <Image
+          src={finalSrc}
+          alt="Video hero"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+      </div>
+    </section>
+  );
 }

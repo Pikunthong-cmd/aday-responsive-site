@@ -12,22 +12,6 @@ type Props = {
 export default function HighlightSection({ title, items, linkTitle }: Props) {
   return (
     <SectionContainer className="pb-10">
-      <div className="mb-6 flex items-center justify-between">
-        {linkTitle && (
-          <Link href={linkTitle} className="group">
-            <h2
-              className="
-                h1 font-bold
-                transition-colors duration-200
-                group-hover:text-[#FE552C]
-              "
-            >
-              {title}
-            </h2>
-          </Link>
-        )}
-      </div>
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
         {items.map((item) => (
           <VideoCard key={item.id} item={item} variant="highlight" />
