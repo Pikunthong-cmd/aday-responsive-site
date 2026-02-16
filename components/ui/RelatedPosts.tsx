@@ -1,93 +1,77 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useRef } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import SectionContainer from "../layout/SectionContainer";
 import { IconArrowNext, IconArrowPrev, IconTextRelated } from "../Icon";
 
-export default function RelatedPosts() {
-  const scrollerRef = useRef<HTMLDivElement | null>(null);
+type Item = {
+  id: number;
+  title: string;
+  image: string;
+  postHref: string;
+  placeText: string;
+  placeHref: string;
+  subjectText: string;
+  subjectHref: string;
+};
 
-  const items = useMemo(
-    () => [
-      {
-        image: "/images/event-1.png",
-        place: "Agenda",
-        title: "Design Perspectives x Golden Pin Salon Bangkok 2025",
-        subject: "a team",
-      },
-      {
-        image: "/images/event-2.png",
-        place: "Agenda",
-        title:
-          "BITEC BURI เปิดตัวโครงการน้องใหม่ “SAMA Garden” พื้นที่สีเขียวฮีลใจคนเมือง Green Lifestyle Centre ครบจบ",
-        subject: "a day",
-      },
-      {
-        image: "/images/event-3.png",
-        place: "Founder",
-        title:
-          "‘House of Mask & Mime’ กลุ่มละครที่ไม่ได้มีแค่หน้ากากและละครใบ้ แต่คือโชว์อะไรก็ได้ที่ไม่พูด!",
-        subject: "สมรภูมิ จันทร์นาคา",
-      },
-      {
-        image: "/images/event-2.png",
-        place: "Agenda",
-        title:
-          "BITEC BURI เปิดตัวโครงการน้องใหม่ “SAMA Garden” พื้นที่สีเขียวฮีลใจคนเมือง Green Lifestyle Centre ครบจบ",
-        subject: "a day",
-      },
-      {
-        image: "/images/event-1.png",
-        place: "Agenda",
-        title: "Another related post title example",
-        subject: "a team",
-      },
-      {
-        image: "/images/event-2.png",
-        place: "Agenda",
-        title: "Another related post title example 2",
-        subject: "a day",
-      },
-    ],
-    [],
-  );
+type Props = {
+  items: Item[];
+};
+
+export default function RelatedPosts({ items }: Props) {
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   const scrollByCards = (dir: "prev" | "next") => {
     const el = scrollerRef.current;
     if (!el) return;
-
     const amount = Math.round(el.clientWidth * 0.9);
-    el.scrollBy({
-      left: dir === "next" ? amount : -amount,
-      behavior: "smooth",
-    });
+    el.scrollBy({ left: dir === "next" ? amount : -amount, behavior: "smooth" });
   };
+
+  if (!items?.length) return null;
 
   return (
     <SectionContainer padded className="bg-[#EFEEE7]" fullWidth>
-      <div className="px-6 py-16 sm:py-20 lg:py-28 xl:py-40 xl:px-40">
-        {/* header row */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
+      <div
+        className={[
+          "px-6 py-16 sm:py-20 lg:py-28 xl:py-40 xl:px-40",
+          mounted ? "[animation:fadeUp_520ms_ease-out_both]" : "opacity-0",
+        ].join(" ")}
+      >
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <IconTextRelated/>
+            <IconTextRelated />
           </div>
 
-          {/* arrows */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button
               type="button"
               onClick={() => scrollByCards("prev")}
-              className="h-10 w-10 grid place-items-center cursor-pointer"
+              className="h-10 w-10 grid place-items-center cursor-pointer hover:opacity-70 transition"
               aria-label="Previous"
             >
               <IconArrowPrev />
             </button>
-
             <button
               type="button"
               onClick={() => scrollByCards("next")}
-              className="h-10 w-10 grid place-items-center cursor-pointer"
+              className="h-10 w-10 grid place-items-center cursor-pointer hover:opacity-70 transition"
               aria-label="Next"
             >
               <IconArrowNext />
@@ -95,9 +79,7 @@ export default function RelatedPosts() {
           </div>
         </div>
 
-        {/* list: mobile 1 / tablet 2 / desktop 3 */}
         <div className="mt-10 sm:mt-14">
-          {/* Desktop: horizontal scroll (optional) + hide overflow outside */}
           <div className="overflow-hidden">
             <div
               ref={scrollerRef}
@@ -112,38 +94,68 @@ export default function RelatedPosts() {
                 sm:[&::-webkit-scrollbar]:hidden
               "
             >
-              {items.slice(0, 3).map((item, index) => (
+              {items.map((item, index) => (
                 <div
-                  key={index}
+                  key={item.id}
                   className={[
-                    "group cursor-pointer shrink-0",
-                    "w-full", // mobile: เห็น 1 ใบ
-                    "sm:w-[calc(50%-12px)]", // tablet: 2 ใบ
-                    "lg:w-[calc(33.333%-16px)]", // desktop: 3 ใบ
-                    index === 1 ? "hidden sm:block" : "", // ใบที่ 2: ซ่อนบน mobile
-                    index === 2 ? "hidden lg:block" : "", // ใบที่ 3: ซ่อนบน mobile+tablet
+                    "group shrink-0",
+                    "w-full",
+                    "sm:w-[calc(50%-12px)]",
+                    "lg:w-[calc(33.333%-16px)]",
+                    mounted
+                      ? `[animation:fadeUp_520ms_ease-out_both] [animation-delay:${index * 90}ms]`
+                      : "opacity-0",
                   ].join(" ")}
                 >
-                  {/* Image */}
-                  <div className="relative overflow-hidden aspect-[3/4] bg-black/5">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-                  </div>
+                  <Link href={item.postHref} className="block">
+                    <div className="relative overflow-hidden aspect-[3/4] bg-black/5">
+                      {item.image ? (
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-black/5" />
+                      )}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
+                    </div>
+                  </Link>
 
-                  {/* Text */}
                   <div className="mt-4 space-y-2 transition-all duration-300 group-hover:translate-y-[-2px]">
-                    <p className="text-xs tracking-widest">{item.place}</p>
-                    <p className="text-base font-bold leading-snug text-black line-clamp-2">
+                    {item.placeHref ? (
+                      <Link
+                        href={item.placeHref}
+                        className="inline-block text-xs tracking-widest uppercase transition-colors duration-300 hover:text-orange-500"
+                      >
+                        {item.placeText}
+                      </Link>
+                    ) : (
+                      <p className="text-xs tracking-widest uppercase">
+                        {item.placeText}
+                      </p>
+                    )}
+
+                    <Link
+                      href={item.postHref}
+                      className="block text-base font-bold leading-snug text-black line-clamp-2 hover:opacity-50 transition"
+                    >
                       {item.title}
-                    </p>
-                    <p className="text-xs tracking-widest text-gray-500">
-                      เรื่อง {item.subject}
-                    </p>
+                    </Link>
+
+                    {item.subjectHref ? (
+                      <Link
+                        href={item.subjectHref}
+                        className="inline-block text-xs tracking-widest text-gray-500 hover:text-orange-500 transition-colors"
+                      >
+                        เรื่อง {item.subjectText}
+                      </Link>
+                    ) : (
+                      <p className="text-xs tracking-widest text-gray-500">
+                        เรื่อง {item.subjectText}
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}

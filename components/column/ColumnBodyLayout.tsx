@@ -1,80 +1,92 @@
-import Image from "next/image";
+"use client";
 
+import { useEffect, useMemo, useState } from "react";
 import SectionContainer from "../layout/SectionContainer";
 
+type Props = {
+  content: string;
+};
 
+function sanitizeContent(html: string) {
+  return (html || "")
+    .replace(/<strong>\s*<\/strong>/gi, "")
+    .replace(/<p>\s*(?:&nbsp;|\u00A0)?\s*<\/p>/gi, "")
+    .trim();
+}
 
-export default function ColumnBodyLayout() {
+export default function ColumnBodyLayout({ content }: Props) {
+  const safe = useMemo(() => sanitizeContent(content), [content]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
 
   return (
     <SectionContainer className="py-8 lg:py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-        {/* LEFT: media column */}
-        {/* <div className="space-y-8">
-          {blocks
-            .filter((b) => b.type === "image")
-            .slice(0, 3)
-            .map((b, idx) => {
-              const img = b as Extract<ColumnBlock, { type: "image" }>;
-              return (
-                <div key={idx} className="relative w-full aspect-[4/5] bg-black/5">
-                  <Image src={img.src} alt={img.alt ?? "image"} fill className="object-cover" />
-                </div>
-              );
-            })}
-        </div> */}
+      <style>{`
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes imgFade {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
 
-        {/* RIGHT: text column */}
-        {/* <article className="prose prose-sm max-w-none">
-          {blocks.map((b, idx) => {
-            if (b.type === "kicker")
-              return (
-                <p key={idx} className="text-xs tracking-wide uppercase text-black/60 font-semibold">
-                  {b.text}
-                </p>
-              );
-
-            if (b.type === "heading")
-              return (
-                <h2 key={idx} className="mt-6 text-[18px] lg:text-[20px] font-semibold text-black">
-                  {b.text}
-                </h2>
-              );
-
-            if (b.type === "paragraph")
-              return (
-                <p key={idx} className="text-[13px] leading-6 text-black/75">
-                  {b.text}
-                </p>
-              );
-
-            if (b.type === "pullquote")
-              return (
-                <div
-                  key={idx}
-                  className="my-8 grid grid-cols-1 sm:grid-cols-2 gap-6 text-center font-semibold text-black"
-                >
-                  <div className="text-base leading-7 whitespace-pre-line">{b.left}</div>
-                  <div className="text-base leading-7 whitespace-pre-line">{b.right}</div>
-                </div>
-              );
-
-            if (b.type === "twoImages")
-              return (
-                <div key={idx} className="my-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="relative aspect-[16/10] bg-black/5">
-                    <Image src={b.leftSrc} alt={b.leftAlt ?? "image"} fill className="object-cover" />
-                  </div>
-                  <div className="relative aspect-[16/10] bg-black/5">
-                    <Image src={b.rightSrc} alt={b.rightAlt ?? "image"} fill className="object-cover" />
-                  </div>
-                </div>
-              );
-
-            // image blocks แสดงฝั่งซ้ายแล้ว ไม่ต้องซ้ำฝั่งขวา
-            return null;
-          })}
-        </article> */}
+      <div
+        className={[
+          "mx-auto max-w-3xl",
+          mounted ? "[animation:fadeUp_520ms_ease-out_both]" : "opacity-0",
+        ].join(" ")}
+      >
+        <article
+          className={[
+            "prose max-w-none",
+            "prose-neutral",
+            "text-black/85",
+            "prose-p:leading-[1.95] prose-p:tracking-[0.01em] prose-p:font-light",
+            "prose-headings:font-semibold prose-headings:tracking-tight",
+            "prose-h2:text-[1.35rem] prose-h2:mt-12 prose-h2:mb-4",
+            "prose-h3:mt-10 prose-h3:mb-3",
+            "prose-hr:my-12",
+            "prose-figure:my-8",
+            "prose-img:my-0",
+            "prose-figcaption:text-sm prose-figcaption:text-black/60",
+            "prose-blockquote:border-l-black/15 prose-blockquote:text-black/70 prose-blockquote:pl-4 prose-blockquote:my-8",
+            "[&>p]:my-5",
+            "[&>figure]:my-10",
+            "[&>figure>img]:w-full",
+            "[&>figure>img]:h-auto",
+            "[&_:where(img)]:[animation:imgFade_520ms_ease-out_both]",
+            "[&_:where(a)]:text-black",
+            "[&_:where(a)]:underline",
+            "[&_:where(a)]:underline-offset-4",
+            "[&_:where(a)]:decoration-black/25",
+            "[&_:where(a)]:transition-colors",
+            "hover:[&_:where(a)]:decoration-orange-500",
+            "hover:[&_:where(a)]:text-orange-600",
+            "hover:[&_:where(a)]:decoration-2",
+            "focus-visible:[&_:where(a)]:outline-none",
+            "focus-visible:[&_:where(a)]:ring-2",
+            "focus-visible:[&_:where(a)]:ring-orange-400/60",
+            "focus-visible:[&_:where(a)]:rounded-sm",
+            "[&_:where(ul)]:my-6 [&_:where(ol)]:my-6",
+            "[&_:where(li)]:my-2",
+            "[&_:where(code)]:px-1 [&_:where(code)]:py-0.5 [&_:where(code)]:rounded-md [&_:where(code)]:bg-black/5 [&_:where(code)]:text-[0.95em]",
+            "[&_:where(pre)]:rounded-2xl [&_:where(pre)]:bg-black [&_:where(pre)]:text-white [&_:where(pre)]:p-4 [&_:where(pre)]:overflow-x-auto",
+            "[&_:where(strong)]:!font-semibold",
+            "[&_:where(strong)]:!text-black",
+            "[&_:where(p>strong:only-child)]:!block",
+            "[&_:where(p>strong:only-child)]:!text-[1.2rem]",
+            "[&_:where(p>strong:only-child)]:!leading-[1.35]",
+            "[&_:where(p>strong:only-child)]:!my-8",
+            "[&_:where(p>strong:only-child)]:!tracking-tight",
+          ].join(" ")}
+          dangerouslySetInnerHTML={{ __html: safe }}
+        />
       </div>
     </SectionContainer>
   );
