@@ -1,6 +1,7 @@
 import ArtistTalkSection from "@/components/artist-talk/ArtistTalkSection";
 import HeroCategory from "@/components/layout/HeroCategory";
 import { categoryFeedAPI } from "@/src/api/category-feed";
+import { notFound } from "next/navigation";
 
 type Params = { slug: string };
 const PAGE_SIZE = 8;
@@ -12,25 +13,36 @@ const SLUG_MAP: Record<string, string> = {
 export default async function MaincourseCategoryPage({
   params,
 }: {
-  params: Promise<Params>;
+  params: Params; 
 }) {
-  const { slug: routeSlug } = await params;
+  const routeSlug = params?.slug;
+
+  if (!routeSlug) {
+    notFound(); 
+  }
 
   const apiSlug = SLUG_MAP[routeSlug] ?? routeSlug;
 
   const catRes = await categoryFeedAPI.getCategoryBySlug(apiSlug);
-  const category = Array.isArray(catRes) ? catRes?.[0] : catRes;
+  const category = catRes?.[0];
 
-  const categoryId: number | null = category?.id ?? null;
+  if (!category) {
+    notFound();
+  }
 
-  const categoryName: string = (category?.name ?? apiSlug).toUpperCase();
+  const categoryId = category.id;
 
-  const heroImg: string =
-    category?.column_image?.sizes?.full?.src ?? "/images/artist-talk/hero.png";
+  const categoryName = (category.name ?? apiSlug).toUpperCase();
 
-  const initialPosts = categoryId
-    ? await categoryFeedAPI.getPostsByCategoryId(categoryId, 0, PAGE_SIZE)
-    : null;
+  const heroImg =
+    category?.column_image?.sizes?.full?.src ??
+    "/images/artist-talk/hero.png";
+
+  const initialPosts = await categoryFeedAPI.getPostsByCategoryId(
+    categoryId,
+    0,
+    PAGE_SIZE
+  );
 
   return (
     <div className="bg-[#EFEEE7]">
@@ -41,7 +53,7 @@ export default async function MaincourseCategoryPage({
         categoriesRes={initialPosts}
         initialOffset={0}
         pageSize={PAGE_SIZE}
-        categoryName = {categoryName}
+        categoryName={categoryName}
       />
     </div>
   );
