@@ -5,14 +5,14 @@ import SeriesHero from "@/components/series/SeriesHero";
 import SeriesGrid from "@/components/series/SeriesGrid";
 import { seriesAPI } from "@/src/api/series";
 
-type SeriesItem = {
+type Item = {
   id: number;
   title: string;
   image: string | null;
   href?: string;
 };
 
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 9;
 
 const stripHtml = (html?: string) =>
   (html ?? "").replace(/<[^>]*>/g, "").trim();
@@ -24,16 +24,20 @@ const pickImage = (post: any) =>
   post?.opengraph_image?.url ||
   null;
 
-const mapToItem = (post: any): SeriesItem => ({
+const mapPostToItem = (post: any): Item => ({
   id: post?.id,
-  title: stripHtml(post?.title?.rendered),
+  title: stripHtml(post?.title?.rendered) || "",
   image: pickImage(post),
-  href: post?.link || "",
+  href: post?.nuxtlink || post?.link || "",
 });
 
+const pickArray = (res: any) =>
+  Array.isArray(res) ? res : res?.items ?? [];
+
 export default function SeriesPage() {
-  const [items, setItems] = useState<SeriesItem[]>([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [rootId, setRootId] = useState<number | null>(null);
+  const [category, setCategory] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,25 +47,29 @@ export default function SeriesPage() {
       try {
         setLoading(true);
 
-        // 1️⃣ ดึง category series
+        
         const catRes = await seriesAPI.getAll();
-        const category = Array.isArray(catRes) ? catRes[0] : catRes;
+        const categoryData = pickArray(catRes)?.[0];
 
-        if (!category?.id) return;
-
-        if (!cancelled) setRootId(category.id);
-
-        // 2️⃣ ดึง posts รอบแรก
-        const postsRes = await seriesAPI.getCategoriesById(
-          category.id,
-          0
-        );
-
-        const mapped = (Array.isArray(postsRes) ? postsRes : []).map(mapToItem);
+        if (!categoryData?.id) return;
 
         if (!cancelled) {
-          setItems(mapped);
+          setRootId(categoryData.id);
+          setCategory(categoryData);
         }
+
+        const postsRes = await seriesAPI.getCategoriesById(
+          categoryData.id,
+          0,
+          PAGE_SIZE
+        );
+
+        const posts = pickArray(postsRes);
+        const mapped = posts
+          .map(mapPostToItem)
+          .filter((x: Item) => x.id && x.title);
+
+        if (!cancelled) setItems(mapped);
       } catch (err) {
         console.error("Series API error:", err);
       } finally {
@@ -74,9 +82,16 @@ export default function SeriesPage() {
     };
   }, []);
 
+  const heroImg =
+    category?.column_image?.sizes?.full?.src ||
+    "/images/artist-talk/hero.png";
+
+  const heroTitle =
+    category?.name?.toUpperCase?.() || "SERIES";
+
   return (
     <main>
-      <SeriesHero />
+      <SeriesHero imageSrc={heroImg} title='' />
 
       <div className="mt-10">
         <SeriesGrid

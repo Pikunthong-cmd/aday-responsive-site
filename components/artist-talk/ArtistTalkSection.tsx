@@ -16,6 +16,7 @@ type Props = {
 
 type CardItem = {
   id: number;
+  slug: string;
   image: string;
   width?: number;
   height?: number;
@@ -35,32 +36,23 @@ function normalizeArray(res: any): any[] {
   return [];
 }
 
-function slugify(input: string) {
-  return (input || "")
-    .toLowerCase()
-    .trim()
-    .replace(/<[^>]*>/g, "")
-    .replace(/[^\p{L}\p{N}]+/gu, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
 function mapToCardItems(raw: any[], categoryName?: string): CardItem[] {
   return raw
     .map((it) => {
       const id = it?.id;
+      const slug = String(it?.slug || "").trim();
       const title = stripHtml(it?.title?.rendered || "");
-
-      const link = id ? `/post/${id}` : "";
-
+      const link = slug ? `/post/${slug}` : "";
       const image = it?.opengraph_image?.url || "";
       const width = Number(it?.opengraph_image?.width);
       const height = Number(it?.opengraph_image?.height);
       const subtitle = it?.author_detail?.name || "";
 
-      if (!id || !title || !link) return null;
+      if (!id || !title || !slug) return null;
 
       return {
         id,
+        slug,
         image,
         width: Number.isFinite(width) ? width : undefined,
         height: Number.isFinite(height) ? height : undefined,
@@ -72,7 +64,6 @@ function mapToCardItems(raw: any[], categoryName?: string): CardItem[] {
     })
     .filter(Boolean) as CardItem[];
 }
-
 
 function CardSkeleton({ count }: { count: number }) {
   return (
@@ -123,7 +114,7 @@ export default function ArtistTalkSection({
       const res = await categoryFeedAPI.getPostsByCategoryId(
         artistTalkId,
         offset,
-        pageSize,
+        pageSize
       );
 
       const raw = normalizeArray(res);
@@ -161,22 +152,14 @@ export default function ArtistTalkSection({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12">
         <div className="flex flex-col">
           {leftItems.map((item, idx) => (
-            <ArtistTalkCard
-              key={item.id}
-              {...item}
-              index={idx * 2}
-            />
+            <ArtistTalkCard key={item.id} {...item} index={idx * 2} />
           ))}
           {loading && <CardSkeleton count={Math.ceil(pageSize / 2)} />}
         </div>
 
         <div className="flex flex-col">
           {rightItems.map((item, idx) => (
-            <ArtistTalkCard
-              key={item.id}
-              {...item}
-              index={idx * 2 + 1}
-            />
+            <ArtistTalkCard key={item.id} {...item} index={idx * 2 + 1} />
           ))}
           {loading && <CardSkeleton count={Math.floor(pageSize / 2)} />}
         </div>

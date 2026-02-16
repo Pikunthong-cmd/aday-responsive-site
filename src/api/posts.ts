@@ -16,8 +16,9 @@ export const postsAPI = {
     return res.data;
   },
 
-  getPostSlug: async (slug:any) => {
+  getPostBySlug: async (slug:any) => {
     const res = await adayApiClientV2.get(`posts?slug=${slug}`);
     return res.data;
   },
+  
 };
