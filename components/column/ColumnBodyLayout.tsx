@@ -1,19 +1,16 @@
 import Image from "next/image";
-import type { ColumnBlock } from "@/app/data/column.mock";
+
 import SectionContainer from "../layout/SectionContainer";
 
-type Props = { blocks: ColumnBlock[] };
 
-export default function ColumnBodyLayout({ blocks }: Props) {
-  // แนวคิดตามภาพ: แถวแรก ๆ เป็น 2 คอลัมน์ (ซ้ายเป็นรูป/รูปย่อย, ขวาเป็นตัวหนังสือ)
-  // สำหรับ mock นี้ เราจะ render เป็น flow ที่ “รูปใหญ่ 1” + “เนื้อหา” ใน 2 คอลัมน์
-  // และรองรับ block แบบ twoImages/pullquote ตามภาพ
+
+export default function ColumnBodyLayout() {
 
   return (
     <SectionContainer className="py-8 lg:py-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* LEFT: media column */}
-        <div className="space-y-8">
+        {/* <div className="space-y-8">
           {blocks
             .filter((b) => b.type === "image")
             .slice(0, 3)
@@ -25,10 +22,10 @@ export default function ColumnBodyLayout({ blocks }: Props) {
                 </div>
               );
             })}
-        </div>
+        </div> */}
 
         {/* RIGHT: text column */}
-        <article className="prose prose-sm max-w-none">
+        {/* <article className="prose prose-sm max-w-none">
           {blocks.map((b, idx) => {
             if (b.type === "kicker")
               return (
@@ -77,7 +74,7 @@ export default function ColumnBodyLayout({ blocks }: Props) {
             // image blocks แสดงฝั่งซ้ายแล้ว ไม่ต้องซ้ำฝั่งขวา
             return null;
           })}
-        </article>
+        </article> */}
       </div>
     </SectionContainer>
   );
