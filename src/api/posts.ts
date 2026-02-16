@@ -15,4 +15,9 @@ export const postsAPI = {
     const res = await adayApiClientV2.get(`posts?tags=${tagId}&per_page=3&page=1`);
     return res.data;
   },
+
+  getPostSlug: async (slug:any) => {
+    const res = await adayApiClientV2.get(`posts?slug=${slug}`);
+    return res.data;
+  },
 };

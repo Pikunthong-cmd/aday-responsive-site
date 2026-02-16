@@ -35,16 +35,27 @@ function normalizeArray(res: any): any[] {
   return [];
 }
 
+function slugify(input: string) {
+  return (input || "")
+    .toLowerCase()
+    .trim()
+    .replace(/<[^>]*>/g, "")
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function mapToCardItems(raw: any[], categoryName?: string): CardItem[] {
   return raw
     .map((it) => {
       const id = it?.id;
+      const title = stripHtml(it?.title?.rendered || "");
+
+      const link = id ? `/post/${id}` : "";
+
       const image = it?.opengraph_image?.url || "";
       const width = Number(it?.opengraph_image?.width);
       const height = Number(it?.opengraph_image?.height);
-      const title = stripHtml(it?.title?.rendered || "");
       const subtitle = it?.author_detail?.name || "";
-      const link = it?.link || "";
 
       if (!id || !title || !link) return null;
 
@@ -61,6 +72,7 @@ function mapToCardItems(raw: any[], categoryName?: string): CardItem[] {
     })
     .filter(Boolean) as CardItem[];
 }
+
 
 function CardSkeleton({ count }: { count: number }) {
   return (

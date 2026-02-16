@@ -5,35 +5,25 @@ import { categoryFeedAPI } from "@/src/api/category-feed";
 type Params = { slug: string };
 const PAGE_SIZE = 8;
 
-function safeDecodeSlug(slug: string) {
-  try {
-    return decodeURIComponent(slug);
-  } catch {
-    return slug;
-  }
-}
+const SLUG_MAP: Record<string, string> = {
+  "people-power-life": "people-power-life",
+};
 
-function formatCategoryTitle(name: string) {
-  const hasThai = /[\u0E00-\u0E7F]/.test(name);
-  return hasThai ? name : name.toUpperCase();
-}
-
-export default async function CreativeCategoryPage({
+export default async function MaincourseCategoryPage({
   params,
 }: {
   params: Promise<Params>;
 }) {
   const { slug: routeSlug } = await params;
 
-  const decodedSlug = safeDecodeSlug(routeSlug);
+  const apiSlug = SLUG_MAP[routeSlug] ?? routeSlug;
 
-  const catRes = await categoryFeedAPI.getCategoryBySlug(decodedSlug);
+  const catRes = await categoryFeedAPI.getCategoryBySlug(apiSlug);
   const category = Array.isArray(catRes) ? catRes?.[0] : catRes;
 
   const categoryId: number | null = category?.id ?? null;
 
-  const categoryNameRaw: string = category?.name ?? decodedSlug;
-  const categoryName: string = formatCategoryTitle(categoryNameRaw);
+  const categoryName: string = (category?.name ?? apiSlug).toUpperCase();
 
   const heroImg: string =
     category?.column_image?.sizes?.full?.src ?? "/images/artist-talk/hero.png";
@@ -47,11 +37,11 @@ export default async function CreativeCategoryPage({
       <HeroCategory imageSrc={heroImg} title={categoryName} />
 
       <ArtistTalkSection
-        artistTalkId={categoryId} 
+        artistTalkId={categoryId}
         categoriesRes={initialPosts}
         initialOffset={0}
         pageSize={PAGE_SIZE}
-        categoryName={categoryName}
+        categoryName = {categoryName}
       />
     </div>
   );

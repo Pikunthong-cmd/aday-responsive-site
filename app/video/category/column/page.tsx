@@ -10,7 +10,7 @@ export default function VideoPageCategoryColumn() {
         <VideoHeroCategory/>
         <DetailsAndShare/>
         <DetailVideoCategory/>
-      <RelatedPosts/>
+        <RelatedPosts/>
     </main>
   );
 }
