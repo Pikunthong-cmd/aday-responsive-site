@@ -34,12 +34,18 @@ function toPostPathFromNuxtlink(nuxtlink?: string) {
 
 function pickImage(p: any) {
   return (
+    p?.opengraph_image?.url ||
     p?.featured_image?.sizes?.medium_large?.src ||
     p?.featured_image?.sizes?.large?.src ||
     p?.featured_image?.sizes?.medium?.src ||
     p?.thumbnail ||
     ""
   );
+}
+
+function pickTitle(p: any) {
+  if (typeof p?.title === "string") return p.title;
+  return p?.title?.rendered || "";
 }
 
 function pickPlace(p: any) {
@@ -61,7 +67,7 @@ function mapRelated(items: any[]): RelatedItem[] {
   return (items || [])
     .map((p) => {
       const id = Number(p?.id);
-      const title = String(p?.title || p?.title?.rendered || "").trim();
+      const title = String(pickTitle(p)).trim();
       const postHref = toPostPathFromNuxtlink(p?.nuxtlink);
       if (!id || !title || !postHref) return null;
 
@@ -92,17 +98,32 @@ export default async function PostPage(props: {
   const post = Array.isArray(res) ? res[0] : res;
   if (!post) return <div className="p-6">Post not found</div>;
 
-  const imageUrl = post?.opengraph_image?.url || "";
-  const title = post?.title?.rendered || "";
+  const imageUrl =
+    post?.opengraph_image?.url ||
+    post?.featured_image?.sizes?.full?.src ||
+    post?.thumbnail ||
+    "";
+
+  const title = pickTitle(post);
   const content = post?.content?.rendered || "";
 
-  const date = formatDMY(post?.modified);
-  const category = post?.data?.keywords || "";
+  const date = formatDMY(post?.date || post?.modified);
+
+  const category =
+    post?.primary_category?.[0]?.name ||
+    post?.category?.[post?.category?.length - 1]?.name ||
+    post?.data?.keywords ||
+    "";
+
   const author = post?.author_detail?.name || "";
   const photographer = post?.photographer_detail?.name || "-";
 
-  const relatedRaw = Array.isArray(post?.related) ? post.related : [];
-  const related = mapRelated(relatedRaw);
+  const relatedRaw =
+    (Array.isArray(post?.related) && post.related) ||
+    (Array.isArray(post?.related_posts) && post.related_posts) ||
+    (Array.isArray(res) && res.length > 1 ? res : []);
+
+  const related = mapRelated(relatedRaw).filter((x) => x.postHref !== `/post/${slug}`);
 
   return (
     <main>

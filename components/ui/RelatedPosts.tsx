@@ -18,10 +18,31 @@ type Item = {
 };
 
 type Props = {
-  items: Item[];
+  items?: Item[];
+  loading?: boolean;
 };
 
-export default function RelatedPosts({ items }: Props) {
+function CardSkeleton({ index }: { index: number }) {
+  return (
+    <div
+      className={[
+        "shrink-0 w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]",
+        index === 1 ? "hidden sm:block" : "",
+        index === 2 ? "hidden lg:block" : "",
+      ].join(" ")}
+    >
+      <div className="aspect-[3/4] bg-black/10 animate-pulse" />
+      <div className="mt-4 space-y-2">
+        <div className="h-3 w-20 bg-black/10 animate-pulse" />
+        <div className="h-5 w-full bg-black/10 animate-pulse" />
+        <div className="h-5 w-4/5 bg-black/10 animate-pulse" />
+        <div className="h-3 w-28 bg-black/10 animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+export default function RelatedPosts({ items = [], loading = false }: Props) {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -37,7 +58,9 @@ export default function RelatedPosts({ items }: Props) {
     el.scrollBy({ left: dir === "next" ? amount : -amount, behavior: "smooth" });
   };
 
-  if (!items?.length) return null;
+  const showSkeleton = loading || items.length === 0;
+
+  if (!showSkeleton && !items.length) return null;
 
   return (
     <SectionContainer padded className="bg-[#EFEEE7]" fullWidth>
@@ -65,6 +88,7 @@ export default function RelatedPosts({ items }: Props) {
               onClick={() => scrollByCards("prev")}
               className="h-10 w-10 grid place-items-center cursor-pointer hover:opacity-70 transition"
               aria-label="Previous"
+              disabled={showSkeleton}
             >
               <IconArrowPrev />
             </button>
@@ -73,6 +97,7 @@ export default function RelatedPosts({ items }: Props) {
               onClick={() => scrollByCards("next")}
               className="h-10 w-10 grid place-items-center cursor-pointer hover:opacity-70 transition"
               aria-label="Next"
+              disabled={showSkeleton}
             >
               <IconArrowNext />
             </button>
@@ -94,71 +119,77 @@ export default function RelatedPosts({ items }: Props) {
                 sm:[&::-webkit-scrollbar]:hidden
               "
             >
-              {items.map((item, index) => (
-                <div
-                  key={item.id}
-                  className={[
-                    "group shrink-0",
-                    "w-full",
-                    "sm:w-[calc(50%-12px)]",
-                    "lg:w-[calc(33.333%-16px)]",
-                    mounted
-                      ? `[animation:fadeUp_520ms_ease-out_both] [animation-delay:${index * 90}ms]`
-                      : "opacity-0",
-                  ].join(" ")}
-                >
-                  <Link href={item.postHref} className="block">
-                    <div className="relative overflow-hidden aspect-[3/4] bg-black/5">
-                      {item.image ? (
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          fill
-                          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 bg-black/5" />
-                      )}
-                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
-                    </div>
-                  </Link>
-
-                  <div className="mt-4 space-y-2 transition-all duration-300 group-hover:translate-y-[-2px]">
-                    {item.placeHref ? (
-                      <Link
-                        href={item.placeHref}
-                        className="inline-block text-xs tracking-widest uppercase transition-colors duration-300 hover:text-orange-500"
-                      >
-                        {item.placeText}
-                      </Link>
-                    ) : (
-                      <p className="text-xs tracking-widest uppercase">
-                        {item.placeText}
-                      </p>
-                    )}
-
-                    <Link
-                      href={item.postHref}
-                      className="block text-base font-bold leading-snug text-black line-clamp-2 hover:opacity-50 transition"
-                    >
-                      {item.title}
+              {showSkeleton ? (
+                <>
+                  <CardSkeleton index={0} />
+                  <CardSkeleton index={1} />
+                  <CardSkeleton index={2} />
+                </>
+              ) : (
+                items.map((item, index) => (
+                  <div
+                    key={item.id}
+                    className={[
+                      "group shrink-0",
+                      "w-full sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]",
+                      mounted
+                        ? `[animation:fadeUp_520ms_ease-out_both] [animation-delay:${index * 90}ms]`
+                        : "opacity-0",
+                    ].join(" ")}
+                  >
+                    <Link href={item.postHref} className="block">
+                      <div className="relative overflow-hidden aspect-[3/4] bg-black/5">
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.title}
+                            fill
+                            className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-black/5" />
+                        )}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-500" />
+                      </div>
                     </Link>
 
-                    {item.subjectHref ? (
+                    <div className="mt-4 space-y-2 transition-all duration-300 group-hover:translate-y-[-2px]">
+                      {item.placeHref ? (
+                        <Link
+                          href={item.placeHref}
+                          className="inline-block text-xs tracking-widest uppercase transition-colors duration-300 hover:text-orange-500"
+                        >
+                          {item.placeText}
+                        </Link>
+                      ) : (
+                        <p className="text-xs tracking-widest uppercase">
+                          {item.placeText}
+                        </p>
+                      )}
+
                       <Link
-                        href={item.subjectHref}
-                        className="inline-block text-xs tracking-widest text-gray-500 hover:text-orange-500 transition-colors"
+                        href={item.postHref}
+                        className="block text-base font-bold leading-snug text-black line-clamp-2 hover:opacity-80 transition"
                       >
-                        เรื่อง {item.subjectText}
+                        {item.title}
                       </Link>
-                    ) : (
-                      <p className="text-xs tracking-widest text-gray-500">
-                        เรื่อง {item.subjectText}
-                      </p>
-                    )}
+
+                      {item.subjectHref ? (
+                        <Link
+                          href={item.subjectHref}
+                          className="inline-block text-xs tracking-widest text-gray-500 hover:text-orange-500 transition-colors"
+                        >
+                          เรื่อง {item.subjectText}
+                        </Link>
+                      ) : (
+                        <p className="text-xs tracking-widest text-gray-500">
+                          เรื่อง {item.subjectText}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>
