@@ -16,17 +16,36 @@ const FALLBACK_IMAGE_SRC = "/images/no-image.png";
 export default function VideoCard({ item, variant = "highlight" }: Props) {
   const isFeatured = variant === "featured";
 
-  const [imgSrc, setImgSrc] = useState<string>(item.image || FALLBACK_IMAGE_SRC);
+  const [imgSrc, setImgSrc] = useState<string>(
+    item.image || FALLBACK_IMAGE_SRC,
+  );
 
   useEffect(() => {
     setImgSrc(item.image || FALLBACK_IMAGE_SRC);
+    console.log(item);
   }, [item.image]);
+
+  const buildVideoHref = (href?: string) => {
+    if (!href) return "#";
+
+    if (href.startsWith("http://") || href.startsWith("https://")) {
+      return href;
+    }
+
+    const clean = href.replace(/^\/+/, "");
+
+    if (clean.startsWith("video/column")) {
+      return `/${clean}`;
+    }
+
+    return `/video/column/${clean}`;
+  };
 
   return (
     <article
       className={cn(
         "group relative overflow-hidden bg-black/5",
-        isFeatured ? "aspect-[16/9]" : "aspect-[4/3] sm:aspect-[16/10]"
+        isFeatured ? "aspect-[16/9]" : "aspect-[4/3] sm:aspect-[16/10]",
       )}
     >
       <img
@@ -47,7 +66,7 @@ export default function VideoCard({ item, variant = "highlight" }: Props) {
             <h3
               className={cn(
                 "line-clamp-2 font-semibold text-white",
-                isFeatured ? "text-base sm:text-lg" : "text-sm sm:text-base"
+                isFeatured ? "text-base sm:text-lg" : "text-sm sm:text-base",
               )}
             >
               {item.title}
@@ -67,7 +86,7 @@ export default function VideoCard({ item, variant = "highlight" }: Props) {
       </div>
 
       <Link
-        href={item.href ?? "#"}
+        href={buildVideoHref(item?.href)}
         aria-label={item.title}
         className="absolute inset-0"
       />

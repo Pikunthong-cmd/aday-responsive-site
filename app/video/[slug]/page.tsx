@@ -36,7 +36,6 @@ const mapPostToVideoItem = (post: any): VideoItem => {
   } as unknown as VideoItem;
 };
 
-// ✅ Skeleton ชิ้นเล็กๆ ใช้ในหน้านี้ได้เลย
 const Sk = ({ className = "" }: { className?: string }) => (
   <div className={`animate-pulse rounded-md bg-black/10 ${className}`} />
 );
@@ -66,7 +65,6 @@ export default function VideoPageCategory() {
   const params = useParams();
 
   const [loading, setLoading] = useState(true);
-
   const [items, setItems] = useState<VideoItem[]>([]);
   const [bgBanner, setBgBanner] = useState<string | null>(null);
   const [title, setTitle] = useState<string>("");
@@ -90,10 +88,7 @@ export default function VideoPageCategory() {
         const categoryRes = await videoAPI.getCategoryVideoBySlug(slug);
         const category = pickArray(categoryRes)?.[0];
 
-        if (!category?.id) {
-          console.warn("Category not found");
-          return;
-        }
+        if (!category?.id) return;
 
         if (!cancelled) {
           setTitle(stripHtml(category?.name ?? ""));
@@ -106,12 +101,18 @@ export default function VideoPageCategory() {
             null;
 
           setBgBanner(hero);
-          setCategoryLink(category?.link ?? null);
+
+          const rawLink = category?.link ?? "";
+          const lastSlug = rawLink.split("/").filter(Boolean).pop();
+          const linkVideo = lastSlug
+            ? `video/column/${lastSlug}`
+            : null;
+
+          setCategoryLink(linkVideo);
         }
 
         const postsRes = await videoAPI.getCatagoryById(category.id);
         const posts = pickArray(postsRes);
-
         const mapped = posts.map(mapPostToVideoItem);
 
         if (!cancelled) {
@@ -131,7 +132,6 @@ export default function VideoPageCategory() {
 
   return (
     <main>
-      {/* HERO + DETAIL */}
       {loading ? (
         <>
           <VideoHeroCategorySkeleton />
@@ -144,7 +144,6 @@ export default function VideoPageCategory() {
         </>
       )}
 
-      {/* SECTION */}
       {loading ? (
         <VideoPageSkeleton sections={1} cardsPerSection={6} />
       ) : (

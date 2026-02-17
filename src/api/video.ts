@@ -11,6 +11,11 @@ export const videoAPI = {
     return res.data;
   },
 
+  getVideoBySlug: async (slug: string) => {
+    const res = await adayApiClientV2.get(`/posts?slug=${slug}`);
+    return res.data;
+  },
+
   getCategoryVideoBySlug: async (slug: string) => {
     const res = await adayApiClientV2.get(`/categories?slug=${slug}`);
     return res.data;

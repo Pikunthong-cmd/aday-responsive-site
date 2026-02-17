@@ -10,6 +10,7 @@ const FALLBACK = "/images/no-image.png";
 
 export default function VideoHeroCategory({ src }: Props) {
   const finalSrc = src || FALLBACK;
+  
   return (
     <section className="relative w-full overflow-hidden">
       <div className="relative w-full aspect-square lg:aspect-[1837/732] max-h-[90vh]">
