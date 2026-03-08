@@ -2,7 +2,7 @@
 
 import KonsanpokFeatureSection from "@/components/konsanpok/KonsanpokFeatureSection";
 import SectionContainer from "@/components/layout/SectionContainer";
-import { konsonpokAPI } from "@/src/api/konsonpok";
+import { khanpok } from "@/src/api/khanpok-person";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -13,25 +13,82 @@ type SpineItem = {
   image: string;
 };
 
+const pickArray = (res: any): any[] => (Array.isArray(res) ? res : res?.items ?? []);
+
+const stripHtml = (html?: string) =>
+  (html ?? "").replace(/<[^>]*>/g, "").trim();
+
+const pickImage = (p: any) =>
+  p?.featured_image?.sizes?.medium_large?.src ||
+  p?.featured_image?.sizes?.large?.src ||
+  p?.featured_image?.sizes?.medium?.src ||
+  p?.opengraph_image?.url ||
+  p?.thumbnail ||
+  "";
+
+const mapPostToSpineItem = (p: any): SpineItem => ({
+  id: String(p?.id ?? ""),
+  number: String(p?.acf?.number ?? p?.id ?? ""),
+  image: pickImage(p) || "/images/no-image.png",
+});
+
 export default function KonsanpokPage() {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [q, setQ] = useState("");
 
-  const items = useMemo<SpineItem[]>(
-    () => [
-      { id: "109", number: "109", image: "/images/mock/konsanpok-5.png" },
-      { id: "110", number: "110", image: "/images/mock/konsanpok-2.png" },
-      { id: "111", number: "111", image: "/images/mock/konsanpok-3.png" },
-      { id: "112", number: "112", image: "/images/mock/konsanpok-4.png" },
-      { id: "113", number: "113", image: "/images/mock/konsanpok-5.png" },
-      { id: "114", number: "114", image: "/images/mock/konsanpok-6.png" },
-      { id: "115", number: "115", image: "/images/mock/konsanpok-7.png" },
-      { id: "116", number: "116", image: "/images/mock/konsanpok-8.png" },
-      { id: "117", number: "117", image: "/images/mock/konsanpok-9.png" },
-      { id: "118", number: "118", image: "/images/mock/konsanpok-10.png" },
-    ],
-    [],
-  );
+  const [loading, setLoading] = useState(true);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [items, setItems] = useState<SpineItem[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setLoading(true);
+
+        const catRes = await khanpok.getAll();
+        const cat = pickArray(catRes)?.[0];
+        const id = Number(cat?.id);
+
+        console.log(catRes);
+
+        if (!id) {
+          if (!cancelled) {
+            setCategoryId(null);
+            setItems([]);
+          }
+          return;
+        }
+
+        if (!cancelled) {
+          setCategoryId(id);
+        }
+
+        const postsRes = await khanpok.getCategoriesById(id);
+        const posts: any[] = pickArray(postsRes);
+        console.log(posts);
+
+        // ✅ FIX: ใส่ type ให้ x ชัดเจน (กัน implicit any)
+        const mapped: SpineItem[] = posts
+          .map(mapPostToSpineItem)
+          .filter((x: SpineItem) => Boolean(x.id));
+
+        if (!cancelled) {
+          setItems(mapped);
+        }
+      } catch (e) {
+        console.error("KonsanpokPage error:", e);
+        if (!cancelled) setItems([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -51,9 +108,7 @@ export default function KonsanpokPage() {
 
   return (
     <main className="bg-[#F5F0E6] text-black pb-20">
-      {/* Container */}
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-        {/* Header row: title + search (desktop) */}
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
             <h1 className="text-[56px] font-black leading-[0.95] tracking-tight sm:text-[72px] lg:text-[88px]">
@@ -67,7 +122,6 @@ export default function KonsanpokPage() {
             </p>
           </div>
 
-          {/* Search (desktop on right, mobile below) */}
           <div className="lg:mt-3">
             <div className="relative w-full lg:w-[420px]">
               <input
@@ -86,7 +140,6 @@ export default function KonsanpokPage() {
                 className="absolute right-2 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center"
                 aria-label="Search"
               >
-                {/* simple magnifier */}
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M10.5 18.5a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z"
@@ -105,7 +158,6 @@ export default function KonsanpokPage() {
           </div>
         </div>
 
-        {/* Carousel */}
         <div className="relative mt-10 overflow-visible sm:mt-12">
           <button
             type="button"
@@ -153,14 +205,13 @@ export default function KonsanpokPage() {
             </svg>
           </button>
 
-          {/* Scroller */}
           <div
             ref={scrollerRef}
             className="
-    mx-14 overflow-x-auto overflow-y-visible scroll-smooth
-    pt-5 pb-8
-    [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-  "
+              mx-14 overflow-x-auto overflow-y-visible scroll-smooth
+              pt-5 pb-8
+              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+            "
           >
             <div className="flex gap-3 sm:gap-4">
               {filtered.map((it) => (
@@ -168,20 +219,19 @@ export default function KonsanpokPage() {
                   key={it.id}
                   href={`/magazine/${it.number}`}
                   className="
-  group relative shrink-0
-  w-[86px] h-[320px]
-  sm:w-[92px] sm:h-[360px]
-  lg:w-[96px] lg:h-[380px]
-  overflow-hidden bg-[#141414] text-white
-  ring-1 ring-black/10
-  transition-all duration-300 ease-out
-  hover:-translate-y-5 
-  active:-translate-y-1
-  focus:outline-none focus-visible:ring-2 focus-visible:ring-black/60
-"
+                    group relative shrink-0
+                    w-[86px] h-[320px]
+                    sm:w-[92px] sm:h-[360px]
+                    lg:w-[96px] lg:h-[380px]
+                    overflow-hidden bg-[#141414] text-white
+                    ring-1 ring-black/10
+                    transition-all duration-300 ease-out
+                    hover:-translate-y-5 
+                    active:-translate-y-1
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-black/60
+                  "
                 >
-                  {/* number */}
-                  <div className="absolute left-0 right-0 top-3 z-10 text-center  font-bold tracking-widest opacity-95">
+                  <div className="absolute left-0 right-0 top-3 z-10 text-center font-bold tracking-widest opacity-95">
                     {it.number}
                   </div>
 
@@ -196,7 +246,6 @@ export default function KonsanpokPage() {
                   </div>
 
                   <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10" />
-
                   <div className="pointer-events-none absolute inset-0 ring-1 ring-white/0 transition duration-300 group-hover:ring-white/15" />
                 </Link>
               ))}
@@ -204,7 +253,6 @@ export default function KonsanpokPage() {
           </div>
         </div>
 
-        {/* Bottom description */}
         <p className="mx-auto mt-10 max-w-3xl text-center text-xs leading-5 text-black/80 sm:mt-12 sm:text-sm sm:leading-6">
           LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT. MAECENAS EGET
           LIGULA NISL. NULLA SIT AMET MAURIS TEMPUS, VENENATIS QUAM VEL, FEUGIAT
@@ -213,6 +261,7 @@ export default function KonsanpokPage() {
           AUCTOR EGESTAS, NULLA URNA RHONCUS ARCU.
         </p>
       </section>
+
       <SectionContainer padded fullWidth={true}>
         <KonsanpokFeatureSection
           heading={`หญิงสาวเจ้าของเพจ ‘นั่งบ่นในห้องลองเสื้อ’\nผู้ให้เสื้อผ้าบำบัดจิตใจ`}
@@ -220,7 +269,7 @@ export default function KonsanpokPage() {
             {
               title: "ทำชุดเป็นการพรางตัวเองไม่ถึงกับพรางตัว",
               paragraphs: [
-                "ช้อปปิ้งเป็นเหมือนการเติมพลังตอนที่จิตใจเราแกว่ง เราจะได้เลือกของตามใจอยาก เป็นการแลกเปลี่ยนกับเรื่องที่ใจเราคุมไม่ได้ เช่น เจ้านายบ่นหรือแฟนทำอะไรไม่ได้ดั่งใจ เหมือนถ้าของขาดเราก็ซื้อมาเติม และจะยิ่งสนุกตอนได้ลองคอลเลกชันใหม่ๆ เหมือนแต่งตัวตามแมกกาซีน เห็นความเคลื่อนไหวของแบรนด์เราไม่อยากซื้อเพราะมันใส่ไม่ได้บ่อยๆ แต่คนมาถามเยอะว่าซื้อที่ไหน จนเราตัดสินใจเปิดเพจขึ้นมา"
+                "ช้อปปิ้งเป็นเหมือนการเติมพลังตอนที่จิตใจเราแกว่ง เราจะได้เลือกของตามใจอยาก เป็นการแลกเปลี่ยนกับเรื่องที่ใจเราคุมไม่ได้ เช่น เจ้านายบ่นหรือแฟนทำอะไรไม่ได้ดั่งใจ เหมือนถ้าของขาดเราก็ซื้อมาเติม และจะยิ่งสนุกตอนได้ลองคอลเลกชันใหม่ๆ เหมือนแต่งตัวตามแมกกาซีน เห็นความเคลื่อนไหวของแบรนด์เราไม่อยากซื้อเพราะมันใส่ไม่ได้บ่อยๆ แต่คนมาถามเยอะว่าซื้อที่ไหน จนเราตัดสินใจเปิดเพจขึ้นมา",
               ],
             },
             {
@@ -232,55 +281,14 @@ export default function KonsanpokPage() {
             },
           ]}
           tiles={[
-            {
-              type: "color",
-              label: "Header",
-              bgClass: "bg-[#FBAC41]",
-              href: "/konsanpok/feature/a",
-            },
-            {
-              type: "image",
-              src: "/images/mock/konsanpok-feature-1.png",
-              alt: "feature 4",
-              href: "/konsanpok/feature/b",
-            },
-            {
-              type: "color",
-              label: "Header",
-              bgClass: "bg-[#077B58]",
-              href: "/konsanpok/feature/c",
-            },
-            {
-              type: "image",
-              src: "/images/mock/konsanpok-feature-2.png",
-              alt: "feature 3",
-              href: "/konsanpok/feature/d",
-            },
-
-            {
-              type: "color",
-              label: "Header",
-              bgClass: "bg-[#685AA4]",
-              href: "/konsanpok/feature/e",
-            },
-            {
-              type: "image",
-              src: "/images/mock/konsanpok-feature-3.png",
-              alt: "feature 2",
-              href: "/konsanpok/feature/f",
-            },
-            {
-              type: "color",
-              label: "Header",
-              bgClass: "bg-[#F15C3A]",
-              href: "/konsanpok/feature/g",
-            },
-            {
-              type: "image",
-              src: "/images/mock/konsanpok-feature-5.png",
-              alt: "feature 1",
-              href: "/konsanpok/feature/h",
-            },
+            { type: "color", label: "Header", bgClass: "bg-[#FBAC41]", href: "/konsanpok/feature/a" },
+            { type: "image", src: "/images/mock/konsanpok-feature-1.png", alt: "feature 4", href: "/konsanpok/feature/b" },
+            { type: "color", label: "Header", bgClass: "bg-[#077B58]", href: "/konsanpok/feature/c" },
+            { type: "image", src: "/images/mock/konsanpok-feature-2.png", alt: "feature 3", href: "/konsanpok/feature/d" },
+            { type: "color", label: "Header", bgClass: "bg-[#685AA4]", href: "/konsanpok/feature/e" },
+            { type: "image", src: "/images/mock/konsanpok-feature-3.png", alt: "feature 2", href: "/konsanpok/feature/f" },
+            { type: "color", label: "Header", bgClass: "bg-[#F15C3A]", href: "/konsanpok/feature/g" },
+            { type: "image", src: "/images/mock/konsanpok-feature-5.png", alt: "feature 1", href: "/konsanpok/feature/h" },
           ]}
         />
       </SectionContainer>

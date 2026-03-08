@@ -19,13 +19,26 @@ export const categoryFeedAPI = {
     offset: number,
     perPage = 8
   ) => {
-    // กัน categoryId พัง
     if (!categoryId) {
       return [];
     }
 
     const res = await adayApiClientV2.get(
       `/posts?page=1&per_page=${perPage}&categories=${categoryId}&offset=${offset}`
+    );
+
+    return Array.isArray(res.data) ? res.data : [];
+  },
+
+  getPostsByCategoryIdAll: async (
+    categoryId: number,
+  ) => {
+    if (!categoryId) {
+      return [];
+    }
+
+    const res = await adayApiClientV2.get(
+      `/posts?&categories=${categoryId}`
     );
 
     return Array.isArray(res.data) ? res.data : [];

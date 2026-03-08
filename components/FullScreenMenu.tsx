@@ -28,11 +28,11 @@ export type MenuResponse = {
 const bottomLinks = [
   { label: "Shop", href: "/shop" },
   { label: "Support us", href: "/support-us" },
-  { label: "Magazine", href: "/magazine" },
+  { label: "Magazine", href: "/a-day-magazine" },
   { label: "Newsletters", href: "/newsletters" },
   { label: "Podcast", href: "/podcast" },
   { label: "Video", href: "/video" },
-  { label: "About", href: "/about" },
+  { label: "About Us", href: "/about-us" },
 ];
 
 const pickHref = (item: MenuItem) => item.nuxtlink || item.url;
@@ -69,7 +69,6 @@ export default function FullScreenMenu({ open, onClose }: Props) {
   const [openMenu, setOpenMenu] = useState<number | null>(null);
   const [menuData, setMenuData] = useState<MenuResponse>({ items: [] });
 
-  // lock scroll (body) ตอนเปิดเมนู
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -96,7 +95,6 @@ export default function FullScreenMenu({ open, onClose }: Props) {
     };
   }, []);
 
-  // ✅ top-level (parent === 0)
   const topItems = useMemo(() => {
     const items = menuData?.items ?? [];
     return sortByOrder(items.filter((x) => x.parent === 0));
@@ -108,7 +106,6 @@ export default function FullScreenMenu({ open, onClose }: Props) {
     return { dropdownItems, directItems };
   }, [topItems]);
 
-  // กัน directItems ซ้ำกับ bottomLinks (optional)
   const bottomHrefSet = useMemo(
     () => new Set(bottomLinks.map((x) => x.href)),
     [],
@@ -119,7 +116,6 @@ export default function FullScreenMenu({ open, onClose }: Props) {
     [directItems, bottomHrefSet],
   );
 
-  // ถ้าปิดเมนูแล้วอยากพับ dropdown ทุกครั้ง
   useEffect(() => {
     if (!open) setOpenMenu(null);
   }, [open]);
@@ -132,9 +128,9 @@ export default function FullScreenMenu({ open, onClose }: Props) {
         ${open ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-6 pointer-events-none"}
       `}
     >
-      {/* ✅ โครงหลักเป็น flex-col แล้วให้ “content” scroll */}
+      
       <div className="h-full flex flex-col">
-        {/* Header (ไม่ scroll) */}
+        
         <div className="h-20 shrink-0 relative">
           <button
             onClick={onClose}
@@ -145,7 +141,7 @@ export default function FullScreenMenu({ open, onClose }: Props) {
           </button>
         </div>
 
-        {/* Content (scroll ได้แน่นอน) */}
+        
         <div
           className="flex-1 min-h-0 overflow-y-auto overscroll-contain scroll-smooth"
           style={{ WebkitOverflowScrolling: "touch" }}
@@ -170,13 +166,12 @@ export default function FullScreenMenu({ open, onClose }: Props) {
               );
             })}
 
-            {/* top-level ที่ไม่มีลูก → link ตรง */}
             {directItemsFiltered.map((top) => (
               <Link
                 key={top.id}
                 href={pickHref(top)}
                 onClick={onClose}
-                className="h1"
+                className="h1 lowercase"
               >
                 {top.title}
               </Link>
