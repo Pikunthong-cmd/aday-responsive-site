@@ -1,0 +1,17 @@
+services:
+  web-ady-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aday-web-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - aday-network
+    restart: unless-stopped
+
+networks:
+  aday-network:
+    driver: bridge
