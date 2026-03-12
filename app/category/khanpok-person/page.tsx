@@ -4,19 +4,19 @@ import KonsanpokFeatureSection from "@/components/konsanpok/KonsanpokFeatureSect
 import SectionContainer from "@/components/layout/SectionContainer";
 import { khanpok } from "@/src/api/khanpok-person";
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+
+type RawPost = any;
 
 type SpineItem = {
   id: string;
   number: string;
   image: string;
+  post: RawPost;
+  searchText: string;
 };
 
 const pickArray = (res: any): any[] => (Array.isArray(res) ? res : res?.items ?? []);
-
-const stripHtml = (html?: string) =>
-  (html ?? "").replace(/<[^>]*>/g, "").trim();
 
 const pickImage = (p: any) =>
   p?.featured_image?.sizes?.medium_large?.src ||
@@ -24,21 +24,96 @@ const pickImage = (p: any) =>
   p?.featured_image?.sizes?.medium?.src ||
   p?.opengraph_image?.url ||
   p?.thumbnail ||
-  "";
+  "/images/no-image.png";
+
+const stripHtml = (html?: string) =>
+  (html ?? "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#8211;/g, "-")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const buildSearchText = (p: any) => {
+  const title = stripHtml(p?.title?.rendered);
+  const content = stripHtml(p?.content?.rendered);
+  const description = stripHtml(p?.yoast_head_json?.og_description);
+  const number = String(p?.acf?.number ?? p?.id ?? "");
+  return [number, title, description, content].join(" ").toLowerCase();
+};
 
 const mapPostToSpineItem = (p: any): SpineItem => ({
   id: String(p?.id ?? ""),
   number: String(p?.acf?.number ?? p?.id ?? ""),
-  image: pickImage(p) || "/images/no-image.png",
+  image: pickImage(p),
+  post: p,
+  searchText: buildSearchText(p),
 });
+
+function SpineSkeleton() {
+  return (
+    <div className="flex gap-3 sm:gap-4">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div
+          key={i}
+          className="relative h-[320px] w-[86px] shrink-0 overflow-hidden bg-black/10 sm:h-[360px] sm:w-[92px] lg:h-[380px] lg:w-[96px]"
+        >
+          <div className="absolute left-0 right-0 top-3 z-10 mx-auto h-4 w-12 animate-pulse rounded bg-white/40" />
+          <div className="h-full w-full animate-pulse bg-[linear-gradient(110deg,rgba(0,0,0,0.06),rgba(0,0,0,0.12),rgba(0,0,0,0.06))] bg-[length:200%_100%] [animation:shine_1.4s_ease-in-out_infinite]" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function IntroSkeleton() {
+  return (
+    <div className="mx-auto mt-10 max-w-3xl sm:mt-12">
+      <div className="mx-auto h-3 w-11/12 animate-pulse rounded bg-black/10" />
+      <div className="mx-auto mt-2 h-3 w-full animate-pulse rounded bg-black/10" />
+      <div className="mx-auto mt-2 h-3 w-10/12 animate-pulse rounded bg-black/10" />
+      <div className="mx-auto mt-2 h-3 w-7/12 animate-pulse rounded bg-black/10" />
+    </div>
+  );
+}
+
+function ContentSkeleton() {
+  return (
+    <SectionContainer padded fullWidth={true}>
+      <section className="mt-14 px-5 sm:mt-16">
+        <div className="mx-auto w-full max-w-[920px]">
+          <div className="mx-auto h-8 w-64 animate-pulse rounded bg-black/10 sm:h-10 sm:w-80" />
+
+          <div className="mx-auto mt-8 max-w-3xl space-y-3">
+            <div className="h-3 w-full animate-pulse rounded bg-black/10" />
+            <div className="h-3 w-11/12 animate-pulse rounded bg-black/10" />
+            <div className="h-3 w-10/12 animate-pulse rounded bg-black/10" />
+            <div className="h-3 w-8/12 animate-pulse rounded bg-black/10" />
+          </div>
+
+          <div className="mx-auto mt-10 h-[280px] max-w-[640px] animate-pulse rounded bg-black/10 sm:h-[360px]" />
+
+          <div className="mx-auto mt-10 max-w-3xl space-y-3">
+            <div className="h-3 w-full animate-pulse rounded bg-black/10" />
+            <div className="h-3 w-full animate-pulse rounded bg-black/10" />
+            <div className="h-3 w-10/12 animate-pulse rounded bg-black/10" />
+          </div>
+        </div>
+      </section>
+    </SectionContainer>
+  );
+}
 
 export default function KonsanpokPage() {
   const scrollerRef = useRef<HTMLDivElement | null>(null);
-  const [q, setQ] = useState("");
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
+  const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
-  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [contentLoading, setContentLoading] = useState(false);
   const [items, setItems] = useState<SpineItem[]>([]);
+  const [selectedPost, setSelectedPost] = useState<RawPost | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,32 +126,20 @@ export default function KonsanpokPage() {
         const cat = pickArray(catRes)?.[0];
         const id = Number(cat?.id);
 
-        console.log(catRes);
-
         if (!id) {
-          if (!cancelled) {
-            setCategoryId(null);
-            setItems([]);
-          }
+          if (!cancelled) setItems([]);
           return;
-        }
-
-        if (!cancelled) {
-          setCategoryId(id);
         }
 
         const postsRes = await khanpok.getCategoriesById(id);
         const posts: any[] = pickArray(postsRes);
-        console.log(posts);
+        console.log(posts)
 
-        // ✅ FIX: ใส่ type ให้ x ชัดเจน (กัน implicit any)
         const mapped: SpineItem[] = posts
           .map(mapPostToSpineItem)
           .filter((x: SpineItem) => Boolean(x.id));
 
-        if (!cancelled) {
-          setItems(mapped);
-        }
+        if (!cancelled) setItems(mapped);
       } catch (e) {
         console.error("KonsanpokPage error:", e);
         if (!cancelled) setItems([]);
@@ -93,8 +156,37 @@ export default function KonsanpokPage() {
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return items;
-    return items.filter((it) => it.number.toLowerCase().includes(s));
+    return items.filter((it) => it.searchText.includes(s));
   }, [items, q]);
+
+  const intro = useMemo(() => {
+    if (!selectedPost) return "";
+    return stripHtml(selectedPost?.yoast_head_json?.og_description) || "";
+  }, [selectedPost]);
+
+  const handleSelectPost = (post: RawPost, id: string) => {
+    const isSame = String(selectedPost?.id ?? "") === id;
+
+    if (isSame) {
+      setSelectedPost(null);
+      setContentLoading(false);
+      return;
+    }
+
+    setContentLoading(true);
+    setSelectedPost(post);
+
+    setTimeout(() => {
+      contentRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 120);
+
+    setTimeout(() => {
+      setContentLoading(false);
+    }, 450);
+  };
 
   const scrollByCards = (dir: "left" | "right") => {
     const el = scrollerRef.current;
@@ -107,7 +199,7 @@ export default function KonsanpokPage() {
   };
 
   return (
-    <main className="bg-[#F5F0E6] text-black pb-20">
+    <main className="bg-[#F5F0E6] pb-20 text-black">
       <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-2xl">
@@ -115,10 +207,7 @@ export default function KonsanpokPage() {
               คนสันปก
             </h1>
             <p className="mt-4 text-xs leading-5 text-black/70 sm:text-sm sm:leading-6">
-              LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT. MAECENAS
-              EGET LIGULA NISL. NULLA SIT AMET MAURIS TEMPUS, VENENATIS QUAM
-              VEL, FEUGIAT MAGNA. CURABITUR ALIQUET MOLESTIE RISUS, IN IACULIS
-              DUI PELLENTESQUE VEL.
+              เลือกสันปกที่ต้องการเพื่อดูรายละเอียดด้านล่าง
             </p>
           </div>
 
@@ -128,16 +217,11 @@ export default function KonsanpokPage() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="SEARCH KONSONPOK"
-                className="
-                  h-12 w-full rounded-full border border-black/60 bg-transparent
-                  pl-5 pr-12 text-xs font-semibold tracking-widest
-                  outline-none placeholder:text-black/70
-                  focus:border-black
-                "
+                className="h-12 w-full rounded-full border border-black/60 bg-transparent pl-5 pr-12 text-xs font-semibold tracking-widest outline-none placeholder:text-black/70 focus:border-black"
               />
               <button
                 type="button"
-                className="absolute right-2 top-1/2 -translate-y-1/2 grid h-9 w-9 place-items-center"
+                className="absolute right-2 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center"
                 aria-label="Search"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -162,13 +246,7 @@ export default function KonsanpokPage() {
           <button
             type="button"
             onClick={() => scrollByCards("left")}
-            className="
-              absolute left-0 top-1/2 z-10 -translate-y-1/2
-              grid h-12 w-12 place-items-center rounded-full bg-white
-              shadow-[0_6px_20px_rgba(0,0,0,0.12)]
-              ring-1 ring-black/10
-              hover:scale-[1.02] active:scale-[0.98]
-            "
+            className="absolute left-0 top-1/2 z-10 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white shadow-[0_6px_20px_rgba(0,0,0,0.12)] ring-1 ring-black/10 hover:scale-[1.02] active:scale-[0.98]"
             aria-label="Scroll left"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -185,13 +263,7 @@ export default function KonsanpokPage() {
           <button
             type="button"
             onClick={() => scrollByCards("right")}
-            className="
-              absolute right-0 top-1/2 z-10 -translate-y-1/2
-              grid h-12 w-12 place-items-center rounded-full bg-white
-              shadow-[0_6px_20px_rgba(0,0,0,0.12)]
-              ring-1 ring-black/10
-              hover:scale-[1.02] active:scale-[0.98]
-            "
+            className="absolute right-0 top-1/2 z-10 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white shadow-[0_6px_20px_rgba(0,0,0,0.12)] ring-1 ring-black/10 hover:scale-[1.02] active:scale-[0.98]"
             aria-label="Scroll right"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -207,91 +279,83 @@ export default function KonsanpokPage() {
 
           <div
             ref={scrollerRef}
-            className="
-              mx-14 overflow-x-auto overflow-y-visible scroll-smooth
-              pt-5 pb-8
-              [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-            "
+            className="mx-14 overflow-x-auto overflow-y-visible scroll-smooth pt-5 pb-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
-            <div className="flex gap-3 sm:gap-4">
-              {filtered.map((it) => (
-                <Link
-                  key={it.id}
-                  href={`/magazine/${it.number}`}
-                  className="
-                    group relative shrink-0
-                    w-[86px] h-[320px]
-                    sm:w-[92px] sm:h-[360px]
-                    lg:w-[96px] lg:h-[380px]
-                    overflow-hidden bg-[#141414] text-white
-                    ring-1 ring-black/10
-                    transition-all duration-300 ease-out
-                    hover:-translate-y-5 
-                    active:-translate-y-1
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-black/60
-                  "
-                >
-                  <div className="absolute left-0 right-0 top-3 z-10 text-center font-bold tracking-widest opacity-95">
-                    {it.number}
-                  </div>
+            {loading ? (
+              <SpineSkeleton />
+            ) : (
+              <div className="flex gap-3 sm:gap-4">
+                {filtered.map((it) => {
+                  const active = String(selectedPost?.id ?? "") === it.id;
 
-                  <div className="absolute inset-0">
-                    <Image
-                      src={it.image}
-                      alt={`Spine ${it.number}`}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 86px, (max-width: 1024px) 92px, 96px"
-                    />
-                  </div>
+                  return (
+                    <button
+                      key={it.id}
+                      type="button"
+                      onClick={() => handleSelectPost(it.post, it.id)}
+                      className={`group relative h-[320px] w-[86px] shrink-0 overflow-hidden bg-[#141414] text-white ring-1 ring-black/10 transition-all duration-300 ease-out sm:h-[360px] sm:w-[92px] lg:h-[380px] lg:w-[96px] ${
+                        active
+                          ? "-translate-y-5 ring-2 ring-black"
+                          : "hover:-translate-y-5 active:-translate-y-1"
+                      }`}
+                    >
+                      <div className="absolute left-0 right-0 top-3 z-10 text-center font-bold tracking-widest opacity-95">
+                        {it.number}
+                      </div>
 
-                  <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10" />
-                  <div className="pointer-events-none absolute inset-0 ring-1 ring-white/0 transition duration-300 group-hover:ring-white/15" />
-                </Link>
-              ))}
-            </div>
+                      <div className="absolute inset-0">
+                        <Image
+                          src={it.image}
+                          alt={`Spine ${it.number}`}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 86px, (max-width: 1024px) 92px, 96px"
+                        />
+                      </div>
+
+                      <div className="pointer-events-none absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/10" />
+                      <div className="pointer-events-none absolute inset-0 ring-1 ring-white/0 transition duration-300 group-hover:ring-white/15" />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
 
-        <p className="mx-auto mt-10 max-w-3xl text-center text-xs leading-5 text-black/80 sm:mt-12 sm:text-sm sm:leading-6">
-          LOREM IPSUM DOLOR SIT AMET, CONSECTETUR ADIPISCING ELIT. MAECENAS EGET
-          LIGULA NISL. NULLA SIT AMET MAURIS TEMPUS, VENENATIS QUAM VEL, FEUGIAT
-          MAGNA. VESTIBULUM UT AUGUE QUIS LECTUS VOLUTPAT EGESTAS. AENEAN
-          EUISMOD QUAM QUIS ORCI IACULIS ELEIFEND. ETIAM FEUGIAT, JUSTO ET
-          AUCTOR EGESTAS, NULLA URNA RHONCUS ARCU.
-        </p>
+        {loading ? (
+          <IntroSkeleton />
+        ) : selectedPost && intro ? (
+          <p className="mx-auto mt-10 max-w-3xl text-center text-xs leading-5 text-black/80 sm:mt-12 sm:text-sm sm:leading-6">
+            {intro}
+          </p>
+        ) : null}
+
+        {!loading && filtered.length === 0 ? (
+          <p className="mt-8 text-sm text-black/60">ไม่พบข้อมูลที่ค้นหา</p>
+        ) : null}
       </section>
 
-      <SectionContainer padded fullWidth={true}>
-        <KonsanpokFeatureSection
-          heading={`หญิงสาวเจ้าของเพจ ‘นั่งบ่นในห้องลองเสื้อ’\nผู้ให้เสื้อผ้าบำบัดจิตใจ`}
-          blocks={[
-            {
-              title: "ทำชุดเป็นการพรางตัวเองไม่ถึงกับพรางตัว",
-              paragraphs: [
-                "ช้อปปิ้งเป็นเหมือนการเติมพลังตอนที่จิตใจเราแกว่ง เราจะได้เลือกของตามใจอยาก เป็นการแลกเปลี่ยนกับเรื่องที่ใจเราคุมไม่ได้ เช่น เจ้านายบ่นหรือแฟนทำอะไรไม่ได้ดั่งใจ เหมือนถ้าของขาดเราก็ซื้อมาเติม และจะยิ่งสนุกตอนได้ลองคอลเลกชันใหม่ๆ เหมือนแต่งตัวตามแมกกาซีน เห็นความเคลื่อนไหวของแบรนด์เราไม่อยากซื้อเพราะมันใส่ไม่ได้บ่อยๆ แต่คนมาถามเยอะว่าซื้อที่ไหน จนเราตัดสินใจเปิดเพจขึ้นมา",
-              ],
-            },
-            {
-              title: "ห้องลองเสื้อแบบไหนที่ทำให้คุณอยากเป็นคนๆ หนึ่ง",
-              paragraphs: [
-                "ห้องกว้างๆ จัดไฟดีๆ ถ้าผนังสีๆ จะยิ่งสนุก พนักงานก็ต้องใจดี ยอมให้ขนเสื้อผ้าเข้าไปลองได้เกิน 4 ตัว",
-                "ตอนนี้ก็ต้องพี่สู่ขวัญ เพราะน่าจะได้ลองแบรนด์แพงๆ ได้ (หัวเราะ) อยากไปลอง ปกติถ้าลองเองจะไม่กล้าเข้าไป",
-              ],
-            },
-          ]}
-          tiles={[
-            { type: "color", label: "Header", bgClass: "bg-[#FBAC41]", href: "/konsanpok/feature/a" },
-            { type: "image", src: "/images/mock/konsanpok-feature-1.png", alt: "feature 4", href: "/konsanpok/feature/b" },
-            { type: "color", label: "Header", bgClass: "bg-[#077B58]", href: "/konsanpok/feature/c" },
-            { type: "image", src: "/images/mock/konsanpok-feature-2.png", alt: "feature 3", href: "/konsanpok/feature/d" },
-            { type: "color", label: "Header", bgClass: "bg-[#685AA4]", href: "/konsanpok/feature/e" },
-            { type: "image", src: "/images/mock/konsanpok-feature-3.png", alt: "feature 2", href: "/konsanpok/feature/f" },
-            { type: "color", label: "Header", bgClass: "bg-[#F15C3A]", href: "/konsanpok/feature/g" },
-            { type: "image", src: "/images/mock/konsanpok-feature-5.png", alt: "feature 1", href: "/konsanpok/feature/h" },
-          ]}
-        />
-      </SectionContainer>
+      <div ref={contentRef}>
+        {contentLoading ? (
+          <ContentSkeleton />
+        ) : selectedPost ? (
+          <SectionContainer padded fullWidth={true}>
+            <KonsanpokFeatureSection html={selectedPost?.content?.rendered || ""} />
+          </SectionContainer>
+        ) : null}
+      </div>
+
+      <style jsx global>{`
+        @keyframes shine {
+          0% {
+            background-position: 200% 0;
+          }
+          100% {
+            background-position: -200% 0;
+          }
+        }
+      `}</style>
     </main>
   );
 }

@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import AuthorLink from "../ui/AuthorLink";
+
 
 type AnyPost = any;
 
@@ -38,8 +40,8 @@ function getCover(post: AnyPost, index: number) {
     index % 3 === 0
       ? "/podcast.svg"
       : index % 3 === 1
-        ? "/podcast-1.svg"
-        : "/podcast-2.svg";
+      ? "/podcast-1.svg"
+      : "/podcast-2.svg";
 
   const fromApi =
     post?.featured_image?.sizes?.full?.src ||
@@ -53,44 +55,14 @@ function getCover(post: AnyPost, index: number) {
   return typeof fromApi === "string" && fromApi.length > 0 ? fromApi : fallback;
 }
 
-function getHostName(post: AnyPost): string {
-  const fromAcf =
-    post?.acf?.host ||
-    post?.acf?.host_name ||
-    post?.acf?.podcast_host ||
-    post?.host;
-
-  if (typeof fromAcf === "string" && fromAcf.trim()) return fromAcf.trim();
-
-  const fromAuthor = post?.author_detail?.name;
-  if (typeof fromAuthor === "string" && fromAuthor.trim())
-    return fromAuthor.trim();
-
-  return "";
-}
-
-function getHostHref(post: AnyPost): string {
-  const href =
-    post?.author_detail?.url ||
-    post?.author_detail?.nuxtlink ||
-    post?.host_url ||
-    post?.host_link;
-
-  return typeof href === "string" ? href : "";
-}
-
 function PostCard({ post, index }: { post: AnyPost; index: number }) {
   const title = stripHtml(post?.title) || "Untitled";
-  const hostName = getHostName(post);
-  const hostHref = getHostHref(post);
-
   const cover = getCover(post, index);
   const href = getPostHref(post);
 
   return (
     <article className="group overflow-hidden shadow-sm transition hover:shadow-md">
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
-        {/* image */}
         <Image
           src={cover}
           alt={title}
@@ -98,6 +70,7 @@ function PostCard({ post, index }: { post: AnyPost; index: number }) {
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.05]"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
+
         <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/85 via-black/35 to-transparent transition-opacity duration-500 group-hover:opacity-95" />
 
         <Link href={href} aria-label={title} className="absolute inset-0 z-[2]">
@@ -109,23 +82,13 @@ function PostCard({ post, index }: { post: AnyPost; index: number }) {
             {title}
           </h3>
 
-          {hostName ? (
-            <div className="mt-1 line-clamp-1 text-sm md:text-base">
-              <span className="text-[#FE552C]">Host : </span>
-
-              {hostHref ? (
-                
-                <Link
-                  href={hostHref}
-                  className="pointer-events-auto relative z-[4] text-[#FE552C] transition-colors duration-300 hover:text-white"
-                >
-                  {hostName}
-                </Link>
-              ) : (
-                <span className="text-[#FE552C]">{hostName}</span>
-              )}
-            </div>
-          ) : null}
+          <AuthorLink
+            post={post}
+            label="Host :"
+            className="pointer-events-auto mt-1 line-clamp-1 text-sm md:text-base"
+            textClassName="text-[#FE552C]"
+            linkClassName="relative z-[4] text-[#FE552C] transition-colors duration-300 hover:text-white"
+          />
         </div>
       </div>
     </article>
@@ -151,7 +114,7 @@ export default function PodcastSection({
       </div>
 
       {displayPosts.length === 0 ? (
-        <div className="border-black/10 bg-white p-6 text-sm text-black/70">
+        <div className="bg-white p-6 text-sm text-black/70">
           ยังไม่มีรายการในหมวดนี้
         </div>
       ) : (

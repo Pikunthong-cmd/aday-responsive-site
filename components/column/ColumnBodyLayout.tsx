@@ -60,6 +60,7 @@ export default function ColumnBodyLayout({ content }: Props) {
             "[&>figure]:my-10",
             "[&>figure>img]:w-full",
             "[&>figure>img]:h-auto",
+            "[&_:where(p)]:indent-6 sm:[&_:where(p)]:indent-8",
             "[&_:where(img)]:[animation:imgFade_520ms_ease-out_both]",
             "[&_:where(a)]:text-black",
             "[&_:where(a)]:underline",

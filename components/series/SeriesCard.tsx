@@ -5,15 +5,23 @@ type Props = {
   item: {
     title: string;
     image: string | null;
-    href?: string; 
+    href?: string;
   };
 };
 
 export default function SeriesCard({ item }: Props) {
-  const href = item.href ?? "#"; 
+  const rawHref = item.href?.trim() || "#";
+
+  const href =
+    rawHref === "#"
+      ? "#"
+      : rawHref.startsWith("/series/")
+      ? rawHref
+      : rawHref.startsWith("/")
+      ? `/series${rawHref}`
+      : `/series/${rawHref}`;
 
   return (
-    
     <Link
       href={href}
       aria-label={item.title}
@@ -37,7 +45,6 @@ export default function SeriesCard({ item }: Props) {
           priority={false}
         />
 
-        {/* ✅ Overlay (ตัวหนังสือจะขึ้นตรงนี้ ไม่เกี่ยวกับรูปมี/ไม่มี) */}
         <div
           className="
             pointer-events-none
@@ -47,10 +54,8 @@ export default function SeriesCard({ item }: Props) {
             group-hover:opacity-100
           "
         >
-          {/* gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
 
-          {/* title */}
           <div
             className="
               absolute bottom-0 left-0 right-0
@@ -60,16 +65,15 @@ export default function SeriesCard({ item }: Props) {
               group-hover:translate-y-0
             "
           >
-            <div className="text-white text-base sm:text-lg font-semibold leading-snug">
+            <div className="text-base font-semibold leading-snug text-white sm:text-lg">
               {item.title}
             </div>
-            <div className="mt-1 text-xs sm:text-sm text-white/80">
+            <div className="mt-1 text-xs text-white/80 sm:text-sm">
               คลิกเพื่อดูรายละเอียด
             </div>
           </div>
         </div>
 
-        {/* ✅ เส้น accent ตอน hover (optional สวย ๆ) */}
         <div
           className="
             absolute left-0 right-0 top-0 h-1

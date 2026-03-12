@@ -79,13 +79,10 @@ export default function MagazineBookReader({
   const contentPages = useMemo(() => pages.filter(Boolean), [pages]);
 
   const bookPages = useMemo(() => {
-    const back = backCoverImage || coverImage;
-    const out: string[] = [coverImage, ...contentPages, back];
-
-    if (out.length % 2 === 1) out.push(back);
-
+    const out = [...contentPages];
+    if (out.length % 2 === 1) out.push("");
     return out;
-  }, [coverImage, backCoverImage, contentPages]);
+  }, [contentPages]);
 
   const totalPages = bookPages.length;
 
@@ -113,7 +110,12 @@ export default function MagazineBookReader({
 
           <div className="flex lg:flex-col gap-4">
             <div className="relative w-16 h-16 lg:w-24 lg:h-24 bg-gray-100 overflow-hidden">
-              <Image src={coverImage} alt={title} fill className="object-cover" />
+              <Image
+                src={contentPages[0] || coverImage}
+                alt={title}
+                fill
+                className="object-cover"
+              />
             </div>
 
             <div className="min-w-0">
@@ -153,7 +155,7 @@ export default function MagazineBookReader({
                 >
                   {bookPages.map((src, i) => {
                     const isCover = i === 0;
-                    const isBackCover = i === bookPages.length - 1 || i === bookPages.length - 2;
+                    const isBackCover = i === bookPages.length - 1;
 
                     return (
                       <div

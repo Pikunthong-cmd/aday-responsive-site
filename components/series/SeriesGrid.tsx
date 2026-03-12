@@ -10,6 +10,7 @@ type Item = {
   id: number;
   title: string;
   image: string | null;
+  slug?: string;
   href?: string;
 };
 
@@ -52,7 +53,8 @@ const mapPostToItem = (post: any): Item => ({
   id: post?.id,
   title: stripHtml(post?.title?.rendered) || "",
   image: pickImage(post),
-  href: post?.nuxtlink || post?.link || "",
+  slug: post?.slug || "",
+  href: post?.slug ? `/series/${post.slug}` : "",
 });
 
 const pickArray = (res: any) => (Array.isArray(res) ? res : res?.items ?? []);
@@ -68,7 +70,6 @@ export default function SeriesGrid({
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(incomingItems.length === pageSize);
 
-  // ✅ สำคัญ: sync props -> state (ไม่งั้น fetch แล้วไม่อัปเดต)
   useEffect(() => {
     setItems(incomingItems);
     setOffset(incomingItems.length);
@@ -85,9 +86,6 @@ export default function SeriesGrid({
       const res = await seriesAPI.getCategoriesById(rootId, offset, pageSize);
       const posts = pickArray(res);
       const mapped = posts.map(mapPostToItem).filter((x: Item) => x.id && x.title);
-
-      console.log("[SeriesGrid] posts:", posts.length);
-      console.log("[SeriesGrid] mapped:", mapped);
 
       setItems((prev) => [...prev, ...mapped]);
       setOffset((prev) => prev + posts.length);
@@ -112,7 +110,6 @@ export default function SeriesGrid({
           <SeriesCard key={item.id} item={item} />
         ))}
 
-        
         {showInitialSkeleton &&
           Array.from({ length: 9 }).map((_, i) => <SeriesCardSkeleton key={`init-sk-${i}`} />)}
 
