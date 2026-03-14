@@ -15,8 +15,8 @@ const mainPages = [
   { label: "VIDEO", href: "/video" },
   { label: "PODCAST", href: "/podcast" },
   { label: "SERIES", href: "/series" },
-  { label: "MAGAZINE", href: "/magazine" },
-  { label: "ACTIVITIES", href: "/activities" },
+  { label: "MAGAZINE", href: "/a-day-magazine" },
+  { label: "ACTIVITIES", href: "/" },
 ];
 
 const utilityPages = [
@@ -26,12 +26,12 @@ const utilityPages = [
 ];
 
 const socialLinks = [
-  { label: "Facebook", href: "#", Icon: IconFacebook },
-  { label: "Instagram", href: "#", Icon: IconIG },
-  { label: "Spotify", href: "#", Icon: IconSpotify },
-  { label: "TikTok", href: "#", Icon: IconTiktok },
-  { label: "X", href: "#", Icon: IconTwiiter },
-  { label: "YouTube", href: "#", Icon: IconYoutube },
+  { label: "Facebook", href: "https://www.facebook.com/adaymagazine", Icon: IconFacebook },
+  { label: "Instagram", href: "https://www.instagram.com/adaymagazine/", Icon: IconIG },
+  { label: "Spotify", href: "https://open.spotify.com/show/5hOCAyn56XoSkLq0PyoreZ?si=8d267bdf705243cf", Icon: IconSpotify },
+  // { label: "TikTok", href: "#", Icon: IconTiktok },
+  { label: "X", href: "http://twitter.com/adaymagazine", Icon: IconTwiiter },
+  { label: "YouTube", href: "https://www.youtube.com/@adaymagazinechannel", Icon: IconYoutube },
 ];
 
 const linkClass =
@@ -150,7 +150,7 @@ export default function Footer() {
                 Privacy Policy
               </Link>{" "}
               /{" "}
-              <Link href="/terms" className={linkClass}>
+              <Link href="/" className={linkClass}>
                 Terms and conditions
               </Link>
               , ©2025
