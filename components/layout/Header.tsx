@@ -26,16 +26,15 @@ export default function Header() {
       `}
     >
       <div className="h-full px-4 md:px-6 lg:px-8 2xl:px-10">
-        <div className="h-full flex items-center justify-between">
+        <div className="flex h-full items-center justify-between">
           <div
             className="
-              relative z-10 flex items-center h-full
+              relative z-10 flex h-full items-center
               pr-6 md:pr-8 lg:pr-10
-              before:content-['']
               before:absolute before:inset-y-0
               before:left-[-100vw] before:right-0
-              before:bg-black
-              before:-z-10
+              before:-z-10 before:bg-black
+              before:content-['']
             "
           >
             <Link href="/" className="inline-block">
@@ -44,11 +43,21 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="cursor-pointer" aria-label="Search" onClick={() => setSearchOpen(true)}>
+            <button
+              type="button"
+              className="cursor-pointer"
+              aria-label="Search"
+              onClick={() => setSearchOpen(true)}
+            >
               <IconSearch width={28} height={28} />
             </button>
 
-            <button className="cursor-pointer" onClick={() => setOpen(true)} aria-label="Open menu">
+            <button
+              type="button"
+              className="cursor-pointer"
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+            >
               <IconMenu width={28} height={28} />
             </button>
 

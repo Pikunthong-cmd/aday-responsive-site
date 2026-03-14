@@ -1,200 +1,110 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import Image from "next/image";
+import { FormEvent, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { IconSearch } from "../Icon";
-import { SearchAPI } from "@/src/api/search";
 
-function useDebouncedValue<T>(value: T, delay = 250) {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
-}
-
-type UIResult = {
-  id: string | number;
-  title: string;
-  category?: string;
-  author?: string;
-  cover?: string;
-};
-
-function normalizeResults(data: any): UIResult[] {
-  const arr = Array.isArray(data) ? data : Array.isArray(data?.results) ? data.results : [];
-  return arr
-    .map((it: any, idx: number) => ({
-      id: it?.id ?? it?._id ?? `${idx}`,
-      title: it?.title ?? it?.name ?? it?.headline ?? "",
-      category: it?.category?.name ?? it?.category ?? it?.section ?? "",
-      author: it?.author?.name ?? it?.author ?? "",
-      cover: it?.cover ?? it?.thumbnail ?? it?.image ?? it?.featured_image ?? "",
-    }))
-    .filter((x: UIResult) => x.title);
-}
-
-export default function SearchOverlay({
-  open,
-  onClose,
-}: {
+type Props = {
   open: boolean;
   onClose: () => void;
-}) {
+};
+
+export default function SearchOverlay({ open, onClose }: Props) {
   const router = useRouter();
-  const [q, setQ] = useState("");
-  const dq = useDebouncedValue(q, 250);
-
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<UIResult[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const goSearch = (slug: string) => {
-    const s = slug.trim();
-    if (!s) return;
-    onClose();
-    router.push(`/search/${encodeURIComponent(s)}`);
-  };
+  const [keyword, setKeyword] = useState("");
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    if (!open) return;
-    setQ("");
-    setResults([]);
-    setError(null);
-    requestAnimationFrame(() => inputRef.current?.focus());
+    if (!open) setKeyword("");
   }, [open]);
 
   useEffect(() => {
     if (!open) return;
 
-    const query = dq.trim();
-    if (!query) {
-      setResults([]);
-      setLoading(false);
-      setError(null);
-      return;
-    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
 
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await SearchAPI.getAll(query);
-        if (cancelled) return;
-        setResults(normalizeResults(data).slice(0, 8));
-      } catch {
-        if (cancelled) return;
-        setError("ค้นหาไม่สำเร็จ");
-        setResults([]);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
+    window.addEventListener("keydown", onKeyDown);
+    document.body.style.overflow = "hidden";
 
     return () => {
-      cancelled = true;
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = "";
     };
-  }, [dq, open]);
+  }, [open, onClose]);
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (!open) return;
-      if (e.key === "Escape") onClose();
-      if (e.key === "Enter") goSearch(q);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, onClose, q]);
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
 
-  const show = open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none";
+    const value = keyword.trim();
+    if (!value || isPending) return;
+
+    onClose();
+
+    startTransition(() => {
+      router.push(`/search/${encodeURIComponent(value)}`);
+    });
+  };
+
+  if (!open) return null;
 
   return (
-    <div className={`fixed inset-0 z-[300] transition-opacity duration-200 ${show}`}>
+    <div className="fixed inset-0 z-[999] bg-black/70">
       <button
-        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-        aria-label="Close search"
+        type="button"
+        className="absolute inset-0"
         onClick={onClose}
+        aria-label="Close search overlay"
       />
 
-      <div className="relative mx-auto mt-16 w-[92%] max-w-3xl">
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-[#0b0b0b] shadow-2xl">
-          <div className="flex items-center justify-between px-5 py-4 sm:px-6">
-            <div className="text-sm font-medium text-white/80">Search</div>
+      <div className="relative mx-auto flex min-h-screen w-full max-w-4xl items-start justify-center px-4 pt-24">
+        <div className="w-full rounded-2xl bg-white p-5 shadow-2xl md:p-6">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-black md:text-xl">
+              Search
+            </h2>
+
             <button
+              type="button"
               onClick={onClose}
-              className="rounded-full px-3 py-1 text-sm text-white/70 hover:bg-white/10"
+              className="text-sm font-medium text-black/60 transition hover:text-black"
             >
               Close
             </button>
           </div>
 
-          <div className="px-5 pb-5 sm:px-6">
-            <div className="rounded-2xl bg-white/5 p-2">
-              <div className="flex items-center gap-2">
-                <div className="grid h-11 w-11 place-items-center rounded-xl bg-white/10">
-                  <IconSearch width={22} height={22} />
-                </div>
-
-                <input
-                  ref={inputRef}
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                  placeholder="พิมพ์คำค้นหา..."
-                  className="h-11 w-full bg-transparent px-2 text-base text-white outline-none placeholder:text-white/40"
-                />
-
-                <button
-                  onClick={() => goSearch(q)}
-                  className="h-11 shrink-0 rounded-xl bg-white px-4 text-sm font-semibold text-black"
-                >
-                  Search
-                </button>
+          <form onSubmit={handleSubmit} className="flex items-center gap-3">
+            <div className="relative flex-1">
+              <input
+                autoFocus
+                type="text"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Search..."
+                disabled={isPending}
+                className="h-12 w-full rounded-full border border-black/15 px-5 pr-12 text-base text-black outline-none transition focus:border-[#FE552C] disabled:bg-black/5"
+              />
+              <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-black/40">
+                <IconSearch width={20} height={20} />
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-between text-xs text-white/50">
-              <div>{loading ? "กำลังค้นหา..." : error ? error : q.trim() ? "Preview" : "เริ่มพิมพ์เพื่อค้นหา"}</div>
-              {q.trim() ? (
-                <button onClick={() => goSearch(q)} className="text-white/80 hover:text-white">
-                  ดูผลทั้งหมด →
-                </button>
-              ) : null}
-            </div>
-
-            {results.length > 0 ? (
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {results.map((r) => (
-                  <button
-                    key={String(r.id)}
-                    onClick={() => goSearch(q)}
-                    className="group flex items-center gap-3 rounded-2xl bg-white/5 p-3 text-left hover:bg-white/10"
-                  >
-                    <div className="relative h-14 w-14 overflow-hidden rounded-xl bg-white/10">
-                      {r.cover ? (
-                        <Image src={r.cover} alt={r.title} fill className="object-cover" />
-                      ) : null}
-                    </div>
-
-                    <div className="min-w-0">
-                      <div className="truncate text-sm font-semibold text-white group-hover:text-white">
-                        {r.title}
-                      </div>
-                      <div className="mt-1 flex items-center gap-2 text-xs text-white/55">
-                        {r.category ? <span className="truncate">{r.category}</span> : null}
-                        {r.author ? <span className="truncate">• {r.author}</span> : null}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
+            <button
+              type="submit"
+              disabled={isPending}
+              className="flex h-12 min-w-[118px] items-center justify-center rounded-full bg-[#FE552C] px-6 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isPending ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                  Searching
+                </span>
+              ) : (
+                "Search"
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>

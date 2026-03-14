@@ -63,3 +63,29 @@ export function getAuthorName(post: AnyPost): string {
 
   return typeof fallback === "string" ? fallback.trim() : "";
 }
+
+export type AuthorStaticMeta = {
+  imageSrc: string;
+  bio?: string;
+  role?: string;
+  since?: string;
+  quote?: string;
+};
+
+export const AUTHOR_META: Record<string, AuthorStaticMeta> = {
+  trainee01: {
+    imageSrc: "/authors/trainee01.jpg",
+    bio: "คิด วิเคราะห์ และเล่าเรื่องผู้คนกับการเปลี่ยนแปลงของสังคม",
+    role: "WRITER",
+    since: "2016",
+    quote: "หาไม่ได้ว่าดีกว่า\nก็คงไม่สามารถเริ่มต้นใหม่ได้",
+  },
+};
+
+export const DEFAULT_AUTHOR_META: AuthorStaticMeta = {
+  imageSrc: "/profile.svg",
+  bio: "",
+  role: "WRITER",
+  since: "",
+  quote: "หาไม่ได้ว่าดีกว่า\nก็คงไม่สามารถเริ่มต้นใหม่ได้",
+};

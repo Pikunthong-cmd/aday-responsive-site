@@ -1,0 +1,60 @@
+import ArtistTalkSection from "@/components/artist-talk/ArtistTalkSection";
+import HeroCategory from "@/components/layout/HeroCategory";
+import { categoryFeedAPI } from "@/src/api/category-feed";
+import { notFound } from "next/navigation";
+
+type Params = { slug: string };
+const PAGE_SIZE = 8;
+
+const SLUG_MAP: Record<string, string> = {
+  "people-power-life": "people-power-life",
+};
+
+export default async function WakeUpCategoryPage({
+  params,
+}: {
+  params: Params; 
+}) {
+  const routeSlug = params?.slug;
+
+  if (!routeSlug) {
+    notFound(); 
+  }
+
+  const apiSlug = SLUG_MAP[routeSlug] ?? routeSlug;
+
+  const catRes = await categoryFeedAPI.getCategoryBySlug(apiSlug);
+  const category = catRes?.[0];
+
+  if (!category) {
+    notFound();
+  }
+
+  const categoryId = category.id;
+
+  const categoryName = (category.name ?? apiSlug).toUpperCase();
+
+  const heroImg =
+    category?.column_image?.sizes?.full?.src ??
+    "/images/artist-talk/hero.png";
+
+  const initialPosts = await categoryFeedAPI.getPostsByCategoryId(
+    categoryId,
+    0,
+    PAGE_SIZE
+  );
+
+  return (
+    <div className="bg-[#EFEEE7]">
+      <HeroCategory imageSrc={heroImg} title={categoryName} />
+
+      <ArtistTalkSection
+        artistTalkId={categoryId}
+        categoriesRes={initialPosts}
+        initialOffset={0}
+        pageSize={PAGE_SIZE}
+        categoryName={categoryName}
+      />
+    </div>
+  );
+}

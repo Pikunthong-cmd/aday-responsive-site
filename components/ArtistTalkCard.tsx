@@ -14,6 +14,9 @@ interface Props {
   index?: number;
   categoryName?: string;
   fallbackImageSrc?: string;
+
+  authorId?: number | string;
+  authorSlug?: string;
 }
 
 function useInView<T extends HTMLElement>() {
@@ -31,7 +34,7 @@ function useInView<T extends HTMLElement>() {
           io.disconnect();
         }
       },
-      { threshold: 0.15 },
+      { threshold: 0.15 }
     );
 
     io.observe(el);
@@ -51,6 +54,8 @@ export default function ArtistTalkCard({
   index = 0,
   categoryName,
   fallbackImageSrc = "/images/no-image.png",
+  authorId,
+  authorSlug,
 }: Props) {
   const imgW = typeof width === "number" && width > 0 ? width : 1200;
   const imgH = typeof height === "number" && height > 0 ? height : 800;
@@ -59,29 +64,31 @@ export default function ArtistTalkCard({
 
   const delayStyle = useMemo(
     () => ({ transitionDelay: `${Math.min(index * 80, 400)}ms` }),
-    [index],
+    [index]
   );
 
   const [imgSrc, setImgSrc] = useState<string>(
-    image?.trim() ? image : fallbackImageSrc,
+    image?.trim() ? image : fallbackImageSrc
   );
 
   useEffect(() => {
     setImgSrc(image?.trim() ? image : fallbackImageSrc);
   }, [image, fallbackImageSrc]);
 
+  const authorLink =
+    authorSlug && authorId ? `/author/${authorSlug}?id=${authorId}` : "#";
+
   return (
     <article
       ref={ref}
       style={delayStyle}
       className={`
-    group
-    flex flex-col gap-3
-    break-inside-avoid
-    mb-12
-    transition-all duration-700 ease-out
-    ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
-  `}
+        flex flex-col gap-3
+        break-inside-avoid
+        mb-12
+        transition-all duration-700 ease-out
+        ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}
+      `}
     >
       <Link href={link} className="block">
         <Image
@@ -103,17 +110,25 @@ export default function ArtistTalkCard({
             font-bold
             text-base sm:text-lg md:text-xl lg:text-2xl
             leading-snug
-            transition-colors
-            duration-700
-            group-hover:text-[#FE552C]
+            transition-colors duration-300
+            hover:text-[#FE552C]
           "
         >
           {title}
         </h2>
+      </Link>
 
-        <p className="text-sm sm:text-base text-neutral-700 font-light">
-          {subtitle}
-        </p>
+      <Link
+        href={authorLink}
+        className="
+          text-sm sm:text-base
+          text-neutral-700
+          font-light
+          transition-colors duration-300
+          hover:text-[#FE552C]
+        "
+      >
+        {subtitle}
       </Link>
     </article>
   );

@@ -1,48 +1,36 @@
 import ArtistTalkSection from "@/components/artist-talk/ArtistTalkSection";
 import HeroCategory from "@/components/layout/HeroCategory";
 import { categoryFeedAPI } from "@/src/api/category-feed";
-import { notFound } from "next/navigation";
 
 type Params = { slug: string };
 const PAGE_SIZE = 8;
 
 const SLUG_MAP: Record<string, string> = {
-  "people-power-life": "people-power-life",
+  "q-and-a-day-interview": "q-and-a-day-interview",
 };
 
-export default async function MaincourseCategoryPage({
+export default async function CreativeCategoryPage({
   params,
 }: {
-  params: Params; 
+  params: Promise<Params>;
 }) {
-  const routeSlug = params?.slug;
-
-  if (!routeSlug) {
-    notFound(); 
-  }
+  const { slug: routeSlug } = await params;
 
   const apiSlug = SLUG_MAP[routeSlug] ?? routeSlug;
 
   const catRes = await categoryFeedAPI.getCategoryBySlug(apiSlug);
-  const category = catRes?.[0];
+  const category = Array.isArray(catRes) ? catRes?.[0] : catRes;
 
-  if (!category) {
-    notFound();
-  }
+  const categoryId: number | null = category?.id ?? null;
 
-  const categoryId = category.id;
+  const categoryName: string = (category?.name ?? apiSlug).toUpperCase();
 
-  const categoryName = (category.name ?? apiSlug).toUpperCase();
+  const heroImg: string =
+    category?.column_image?.sizes?.full?.src ?? "/images/artist-talk/hero.png";
 
-  const heroImg =
-    category?.column_image?.sizes?.full?.src ??
-    "/images/artist-talk/hero.png";
-
-  const initialPosts = await categoryFeedAPI.getPostsByCategoryId(
-    categoryId,
-    0,
-    PAGE_SIZE
-  );
+  const initialPosts = categoryId
+    ? await categoryFeedAPI.getPostsByCategoryId(categoryId, 0, PAGE_SIZE)
+    : null;
 
   return (
     <div className="bg-[#EFEEE7]">
@@ -53,7 +41,7 @@ export default async function MaincourseCategoryPage({
         categoriesRes={initialPosts}
         initialOffset={0}
         pageSize={PAGE_SIZE}
-        categoryName={categoryName}
+        categoryName = {categoryName}
       />
     </div>
   );

@@ -27,6 +27,7 @@ import {
 } from "@/src/lib/postsVideoHomeHelpers";
 
 import { buildCategoryCardsFromMenu } from "@/src/lib/categoryMenuHelpers";
+import HeroSkeleton from "@/components/home/skeletons/HeroSkeleton";
 
 import {
   EventCard,
@@ -37,12 +38,10 @@ import {
 } from "@/src/lib/eventHomeHelpers";
 
 type BannerVideoResponse = {
+  key: string;
   bannerVideo: string;
   linkUrl: string;
 };
-
-import HeroSkeleton from "@/components/home/skeletons/HeroSkeleton";
-// (เดี๋ยว component อื่นค่อยทำ skeleton ทีละตัว)
 
 export default function Home() {
   const [menu, setMenu] = useState<MenuResponse | null>(null);
@@ -79,11 +78,18 @@ export default function Home() {
       try {
         setLoadingHomeSections(true);
         const [bannerRes, postsRes] = await Promise.all([
-          homeAPI.getAllBanerVideo() as Promise<BannerVideoResponse>,
+          homeAPI.getAllBanerVideo() as Promise<BannerVideoResponse[]>,
           postsAPI.getVideoHome() as Promise<VideoHomeApiPost[]>,
         ]);
+
         if (!mounted) return;
-        setBanner(bannerRes);
+
+        const mainBanner = bannerRes.find((item) => item.key === "main");
+
+        if (mainBanner) {
+          setBanner(mainBanner);
+        }
+        console.log(">>>>>>", bannerRes);
         setVideoCards(mapRelatedToCards(postsRes, 3));
       } catch (e) {
         console.error("Failed to load home sections", e);
@@ -135,7 +141,7 @@ export default function Home() {
         title: item.title,
         tag: item.title,
         order: item.order,
-      })
+      }),
     );
 
     return sortByOrder(mapped).slice(0, 10);
@@ -163,7 +169,6 @@ export default function Home() {
 
       <MagazineType />
 
-      {/* Experimental / Category / Event เดี๋ยวค่อยทำ skeleton ทีละตัว */}
       <Experimental
         bannerVideo={banner?.bannerVideo}
         linkUrl={banner?.linkUrl}
@@ -175,4 +180,3 @@ export default function Home() {
     </div>
   );
 }
-
