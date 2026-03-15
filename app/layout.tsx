@@ -5,6 +5,7 @@ import { lineSeedSansTH } from "./font";
 import Footer from "@/components/ui/Footer";
 import WatchCursor from "@/components/ui/WatchCursor";
 import Header from "@/components/layout/Header";
+import CookieConsent from "@/components/cookie/CookieConsent";
 
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({
         <Header />
         <WatchCursor />
         <main>{children}</main>
+        <CookieConsent />
         <Footer />
       </body>
     </html>

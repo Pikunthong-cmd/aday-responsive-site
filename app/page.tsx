@@ -89,8 +89,9 @@ export default function Home() {
         if (mainBanner) {
           setBanner(mainBanner);
         }
-        console.log(">>>>>>", bannerRes);
+        
         setVideoCards(mapRelatedToCards(postsRes, 3));
+        console.log(postsRes)
       } catch (e) {
         console.error("Failed to load home sections", e);
       } finally {

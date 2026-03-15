@@ -21,6 +21,8 @@ export default function Experimental({
 }: ExperimentalProps) {
   const href = linkUrl || "/";
 
+  console.log(videoCards)
+
   return (
     <section className="w-full my-5">
       {/* HERO VIDEO */}
@@ -117,9 +119,6 @@ export default function Experimental({
               </div>
 
               <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
-                {/* <div className="text-white text-sm font-semibold line-clamp-2">
-                  {item.title}
-                </div> */}
               </div>
             </a>
           ))}

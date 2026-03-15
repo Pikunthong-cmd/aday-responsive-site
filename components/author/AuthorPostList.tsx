@@ -145,7 +145,7 @@ function FeaturedCard({
 
   return (
     <article className="overflow-hidden border border-black/8 bg-[#E7E2D8]">
-      <Link href={href} className="grid grid-cols-1 xl:grid-cols-[4fr_6fr_3fr]">
+      <Link href={'/post'+href} className="grid grid-cols-1 xl:grid-cols-[4fr_6fr_3fr]">
         <div className="relative aspect-[4/3] xl:aspect-auto xl:min-h-[228px]">
           <Image
             src={image}

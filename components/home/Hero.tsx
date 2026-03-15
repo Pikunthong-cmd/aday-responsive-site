@@ -28,7 +28,7 @@ export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
 
   return (
     <section className="w-full">
-      <div className="relative h-[100svh] w-full overflow-hidden">
+      <div className="relative w-full overflow-hidden aspect-[16/9]">
         <Image
           src={active.image}
           alt={active.title}
