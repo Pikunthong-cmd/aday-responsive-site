@@ -8,8 +8,8 @@ function HeroSkeleton() {
       <div className="mx-auto max-w-[1280px] px-6 pb-8 pt-5 sm:px-6 sm:pb-10 sm:pt-6 md:px-8 md:pb-12 md:pt-8 lg:px-10 lg:pb-14 lg:pt-8">
         <div className="flex min-h-[264px] flex-col md:min-h-[312px] lg:min-h-[338px]">
           <div className="flex items-start justify-between">
-            <SkeletonBlock className="h-[82px] w-[82px] rounded-full border border-[#FE552C]/40 bg-white/10 sm:h-[96px] sm:w-[96px] md:h-[118px] md:w-[118px]" />
-            <SkeletonBlock className="hidden h-[126px] w-[126px] rounded-full border border-[#FE552C]/40 bg-white/10 md:block" />
+            <SkeletonBlock className="h-[82px] w-[82px] rounded-full border border-[#FE552C]/40 bg-white/10 sm:h-[96px] sm:w-[96px] md:h-[118px] md:w-[118px] justify-end" />
+            {/* <SkeletonBlock className="hidden h-[126px] w-[126px] rounded-full border border-[#FE552C]/40 bg-white/10 md:block" /> */}
           </div>
 
           <div className="mt-6 max-w-[760px]">

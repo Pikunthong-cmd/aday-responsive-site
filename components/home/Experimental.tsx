@@ -43,6 +43,7 @@ export default function Experimental({
             ) as HTMLElement | null;
             el?.removeAttribute("data-active");
           }}
+          target="blank"
         >
           <video
             className="w-full h-auto object-cover cursor-none"
@@ -102,6 +103,7 @@ export default function Experimental({
               href={item.href}
               className="group relative block w-full overflow-hidden"
               aria-label={item.title}
+              target="blank"
             >
               <div className="aspect-video w-full bg-black/10">
                 <img

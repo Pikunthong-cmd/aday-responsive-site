@@ -32,6 +32,19 @@ function toPostPathFromNuxtlink(nuxtlink?: string) {
   return slug ? `/post/${slug}` : "";
 }
 
+function toAuthorPath(authorSlug?: string, authorId?: number | string) {
+  const safeSlug = String(authorSlug || "").trim();
+  const safeId = String(authorId || "").trim();
+  if (!safeSlug || !safeId) return "";
+  return `/author/${safeSlug}?id=${safeId}`;
+}
+
+function getAuthorSlugFromNuxtlink(nuxtlink?: string) {
+  const p = String(nuxtlink || "").trim();
+  if (!p) return "";
+  return p.replace(/^\/+|\/+$/g, "").split("/").pop() || "";
+}
+
 function pickImage(p: any) {
   return (
     p?.opengraph_image?.url ||
@@ -88,6 +101,37 @@ function mapRelated(items: any[]): RelatedItem[] {
     .filter(Boolean) as RelatedItem[];
 }
 
+function getPostCategory(post: any) {
+  const primary = post?.primary_category?.[0];
+  if (primary?.name) {
+    return {
+      text: primary.name,
+      href: primary?.nuxtlink || "",
+    };
+  }
+
+  const last = post?.category?.[post?.category?.length - 1];
+  if (last?.name) {
+    return {
+      text: last.name,
+      href: last?.nuxtlink || "",
+    };
+  }
+
+  const first = post?.category?.[0];
+  if (first?.name) {
+    return {
+      text: first.name,
+      href: first?.nuxtlink || "",
+    };
+  }
+
+  return {
+    text: post?.data?.keywords || "",
+    href: "",
+  };
+}
+
 export default async function PostPage(props: {
   params: Promise<{ slug: string }>;
 }) {
@@ -109,13 +153,15 @@ export default async function PostPage(props: {
 
   const date = formatDMY(post?.date || post?.modified);
 
-  const category =
-    post?.primary_category?.[0]?.name ||
-    post?.category?.[post?.category?.length - 1]?.name ||
-    post?.data?.keywords ||
-    "";
+  const categoryData = getPostCategory(post);
+  const category = categoryData.text;
+  const categoryHref = categoryData.href;
 
   const author = post?.author_detail?.name || "";
+  const authorId = post?.author_detail?.id || "";
+  const authorSlug = getAuthorSlugFromNuxtlink(post?.author_detail?.nuxtlink);
+  const authorHref = toAuthorPath(authorSlug, authorId);
+
   const photographer = post?.photographer_detail?.name || "-";
 
   const relatedRaw =
@@ -131,7 +177,9 @@ export default async function PostPage(props: {
       <DetailsAndShare
         date={date}
         category={category}
+        categoryHref={categoryHref}
         author={author}
+        authorHref={authorHref}
         photographer={photographer}
       />
       <ColumnBodyLayout content={content} />

@@ -18,6 +18,7 @@ import {
   flattenMenu,
   findRootCategoryTitle,
   sortByOrder,
+  pickHref,
 } from "@/src/lib/menuHelpers";
 
 import {
@@ -36,6 +37,7 @@ import {
   findEventTagId,
   mapRelatedToEventCards,
 } from "@/src/lib/eventHomeHelpers";
+import WatchCursor from "@/components/ui/WatchCursor";
 
 type BannerVideoResponse = {
   key: string;
@@ -89,9 +91,8 @@ export default function Home() {
         if (mainBanner) {
           setBanner(mainBanner);
         }
-        
+
         setVideoCards(mapRelatedToCards(postsRes, 3));
-        console.log(postsRes)
       } catch (e) {
         console.error("Failed to load home sections", e);
       } finally {
@@ -128,6 +129,7 @@ export default function Home() {
 
   const slides: HeroSlide[] = useMemo(() => {
     if (!menu?.items?.length) return [];
+
     const tree = menu.items;
     const flat = flattenMenu(tree);
 
@@ -135,22 +137,20 @@ export default function Home() {
       .filter((i) => i.important === true)
       .filter((i) => typeof i.banner_image === "string" && i.banner_image);
 
-    const mapped: (HeroSlide & { order?: number })[] = importantItems.map(
-      (item) => ({
-        image: item.banner_image as string,
-        category: findRootCategoryTitle(item, tree) || "Featured",
-        title: item.title,
-        tag: item.title,
-        order: item.order,
-      }),
-    );
+    const mapped: (HeroSlide & { order?: number })[] = importantItems.map((item) => ({
+      image: item.banner_image as string,
+      category: findRootCategoryTitle(item, tree) || "Featured",
+      title: item.title || "",
+      description: item.description || "",
+      link: pickHref(item) || "",
+      order: item.order,
+    }));
 
     return sortByOrder(mapped).slice(0, 10);
   }, [menu]);
 
   return (
     <div className="bg-[#EFEEE7]">
-      {/* HERO */}
       {loadingMenu ? (
         <HeroSkeleton />
       ) : slides.length > 0 ? (
@@ -161,15 +161,16 @@ export default function Home() {
             {
               image: "/images/hero.png",
               category: "a day",
-              title: "No featured items (important=true) found",
-              tag: "Featured",
+              title: "No featured items found",
+              description: "",
+              link: "",
             },
           ]}
         />
       )}
 
       <MagazineType />
-
+      <WatchCursor />
       <Experimental
         bannerVideo={banner?.bannerVideo}
         linkUrl={banner?.linkUrl}

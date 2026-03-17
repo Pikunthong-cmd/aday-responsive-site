@@ -5,8 +5,13 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import DropdownItem from "./home/DropdownItem";
 import { menuAPI } from "@/src/api/menu";
-import { IconFacebook, IconIG, IconSpotify, IconTwiiter, IconYoutube } from "./Icon";
-
+import {
+  IconFacebook,
+  IconIG,
+  IconSpotify,
+  IconTwiiter,
+  IconYoutube,
+} from "./Icon";
 
 type Props = {
   open: boolean;
@@ -138,12 +143,12 @@ export default function FullScreenMenu({ open, onClose }: Props) {
 
   const bottomHrefSet = useMemo(
     () => new Set(bottomLinks.map((x) => x.href)),
-    []
+    [],
   );
 
   const directItemsFiltered = useMemo(
     () => directItems.filter((x) => !bottomHrefSet.has(pickHref(x))),
-    [directItems, bottomHrefSet]
+    [directItems, bottomHrefSet],
   );
 
   useEffect(() => {
@@ -212,30 +217,40 @@ export default function FullScreenMenu({ open, onClose }: Props) {
           </nav>
 
           <div className="w-full overflow-hidden py-6">
-            <div
-              className="flex w-max"
-              style={{ animation: "menu-scroll 50s linear infinite" }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.animationPlayState = "paused")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.animationPlayState = "running")
-              }
-            >
+            {/*
+  <div
+    className="flex w-max"
+    style={{ animation: "menu-scroll 50s linear infinite" }}
+    onMouseEnter={(e) =>
+      (e.currentTarget.style.animationPlayState = "paused")
+    }
+    onMouseLeave={(e) =>
+      (e.currentTarget.style.animationPlayState = "running")
+    }
+  >
+    <img
+      src="/images/menu-strip.png"
+      alt="Menu strip"
+      className="h-40 select-none object-cover pointer-events-none"
+    />
+    <img
+      src="/images/menu-strip.png"
+      alt=""
+      className="h-40 select-none object-cover pointer-events-none"
+    />
+  </div>
+  */}
+
+            <div className="w-full">
               <img
-                src="/images/menu-strip.png"
+                src="/images/menu-strip.jpg"
                 alt="Menu strip"
-                className="h-40 select-none object-cover pointer-events-none"
-              />
-              <img
-                src="/images/menu-strip.png"
-                alt=""
-                className="h-40 select-none object-cover pointer-events-none"
+                className="h-40 w-full select-none object-cover pointer-events-none"
               />
             </div>
           </div>
 
-          <div className="flex w-full flex-wrap justify-center gap-6 pb-10">
+          <div className="flex w-full flex-wrap justify-center gap-6 pb-10 uppercase mt-6">
             {bottomLinks.map((item) => (
               <Link
                 key={`bottom-${item.href}`}
@@ -261,7 +276,7 @@ export default function FullScreenMenu({ open, onClose }: Props) {
                   aria-label={item.label}
                   className="transition-all duration-200 hover:scale-110 hover:text-[#FE552C]"
                 >
-                  <Icon width={26} height={26} fill="black"/>
+                  <Icon width={26} height={26} fill="black" />
                 </a>
               );
             })}

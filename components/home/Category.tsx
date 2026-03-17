@@ -43,8 +43,8 @@ export default function Category({ items }: Props) {
               <p className="h1 uppercase tracking-widest font-bold">
                 {item.category}
               </p>
-              <h3 className="text-lg md:text-xl font-light leading-snug">
-                {item.title}
+              <h3 className="text-lg font-light leading-snug">
+                See more
               </h3>
             </div>
           </Link>

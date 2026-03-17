@@ -14,7 +14,6 @@ interface Props {
   index?: number;
   categoryName?: string;
   fallbackImageSrc?: string;
-
   authorId?: number | string;
   authorSlug?: string;
 }

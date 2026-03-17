@@ -22,7 +22,6 @@ export default function RootLayout({
     <html lang="th">
       <body className={lineSeedSansTH.className}>
         <Header />
-        <WatchCursor />
         <main>{children}</main>
         <CookieConsent />
         <Footer />

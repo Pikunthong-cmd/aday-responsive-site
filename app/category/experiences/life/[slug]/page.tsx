@@ -32,6 +32,9 @@ export default async function CreativeCategoryPage({
     ? await categoryFeedAPI.getPostsByCategoryId(categoryId, 0, PAGE_SIZE)
     : null;
 
+  console.log(initialPosts)
+
+
   return (
     <div className="bg-[#EFEEE7]">
       <HeroCategory imageSrc={heroImg} title={categoryName} />

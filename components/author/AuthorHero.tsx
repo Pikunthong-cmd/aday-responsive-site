@@ -45,7 +45,7 @@ export default function AuthorHero({
               </p>
             </div>
 
-            <h1 className="leading-[0.9] tracking-[-0.04em]">
+            <h1 className="leading-tight md:leading-[1.05] lg:leading-[1.1] tracking-[-0.04em]">
               <span className="block text-[48px] font-bold text-white md:text-[64px] lg:text-[72px]">
                 {firstLine}
               </span>
