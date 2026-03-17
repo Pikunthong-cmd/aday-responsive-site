@@ -19,7 +19,6 @@ export default async function CreativeCategoryPage({
   const apiSlug = SLUG_MAP[routeSlug] ?? routeSlug;
 
   const catRes = await categoryFeedAPI.getCategoryBySlug(apiSlug);
-  console.log(catRes)
   const category = Array.isArray(catRes) ? catRes?.[0] : catRes;
 
   const categoryId: number | null = category?.id ?? null;

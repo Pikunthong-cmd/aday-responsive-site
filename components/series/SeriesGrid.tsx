@@ -78,9 +78,6 @@ export default function SeriesGrid({
 
   const loadMore = async () => {
     if (!rootId || loading || !hasMore) return;
-
-    console.log("[SeriesGrid] loadMore start", { rootId, offset, pageSize });
-
     setLoading(true);
     try {
       const res = await seriesAPI.getCategoriesById(rootId, offset, pageSize);

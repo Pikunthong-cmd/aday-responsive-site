@@ -133,7 +133,6 @@ export default function KonsanpokPage() {
 
         const postsRes = await khanpok.getCategoriesById(id);
         const posts: any[] = pickArray(postsRes);
-        console.log(posts)
 
         const mapped: SpineItem[] = posts
           .map(mapPostToSpineItem)

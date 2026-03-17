@@ -20,9 +20,6 @@ export default function Experimental({
   videoCards = [],
 }: ExperimentalProps) {
   const href = linkUrl || "/";
-
-  console.log(videoCards)
-
   return (
     <section className="w-full my-5">
       {/* HERO VIDEO */}

@@ -105,10 +105,7 @@ export default function ArtistTalkSection({
 
   useEffect(() => {
     const raw = normalizeArray(categoriesRes);
-    console.log(raw)
     const mapped = mapToCardItems(raw, categoryName);
-
-    console.log(">>>>>>>",raw)
 
     setItems(mapped);
     setOffset(initialOffset + mapped.length);

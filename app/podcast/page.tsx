@@ -18,8 +18,6 @@ export default async function PodcastPage() {
 
   const categoryId: number | null = category?.id ?? null;
 
-  console.log(categoryId);
-
   const categoryNameRaw: string = category?.name ?? decodedSlug;
   const categoryName: string = formatCategoryTitle(categoryNameRaw);
 
@@ -36,8 +34,6 @@ export default async function PodcastPage() {
       ? [initialPosts]
       : [];
   const listPosts = postsArray;
-
-  console.log(listPosts);
 
   return (
     <div className="bg-[#EFEEE7]">
