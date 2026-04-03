@@ -10,6 +10,7 @@ import FullScreenMenu from "../FullScreenMenu";
 import { themeFromPathname } from "../constants/headerThemeRouteMap";
 import { HEADER_THEME_CLASS } from "../constants/headerTheme";
 import SearchOverlay from "./SearchOverlay";
+import GTranslateSwitcher from "./GTranslateSwitcher";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -43,6 +44,8 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-4">
+            <GTranslateSwitcher />
+
             <button
               type="button"
               className="cursor-pointer"
