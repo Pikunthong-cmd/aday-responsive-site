@@ -10,8 +10,16 @@ export type RelatedItem = {
   thumbnail?: string;
   nuxtlink?: string;
   link?: string;
-  author_detail?: { name?: string };
-  primary_category?: Array<{ nicename?: string }>;
+  author_detail?: {
+    id?: number;
+    name?: string;
+    nuxtlink?: string;
+  };
+  primary_category?: Array<{
+    nicename?: string;
+    name?: string;
+    nuxtlink?: string;
+  }>;
 };
 
 export type EventHomePost = {
@@ -24,8 +32,10 @@ export type EventCard = {
   href: string;
   image: string;
   place: string;
+  placeHref: string;
   title: string;
   subject: string;
+  subjectHref: string;
 };
 
 function normalize(s: string) {
@@ -33,7 +43,6 @@ function normalize(s: string) {
 }
 
 export function findEventTagId(tags: EventTag[]): number | null {
-  // หา tag ที่เป็น event (รองรับทั้ง name และ slug)
   const t =
     tags.find((x) => normalize(x.slug || "") === "event") ||
     tags.find((x) => normalize(x.name || "") === "event");
@@ -45,14 +54,33 @@ function pickHref(r: RelatedItem) {
 }
 
 function pickPlace(r: RelatedItem) {
-  return r.primary_category?.[0]?.nicename || "";
+  return r.primary_category?.[0]?.nicename || r.primary_category?.[0]?.name || "";
+}
+
+function pickPlaceHref(r: RelatedItem) {
+  return r.primary_category?.[0]?.nuxtlink || "#";
 }
 
 function pickSubject(r: RelatedItem) {
   return r.author_detail?.name || "";
 }
 
-export function mapRelatedToEventCards(posts: EventHomePost[], limit = 3): EventCard[] {
+function pickSubjectHref(r: RelatedItem) {
+  const authorId = r.author_detail?.id;
+  const authorNuxtlink = r.author_detail?.nuxtlink || "";
+  const authorSlug = authorNuxtlink.split("/").filter(Boolean).pop();
+
+  if (authorId && authorSlug) {
+    return `/author/${authorSlug}?id=${authorId}`;
+  }
+
+  return "#";
+}
+
+export function mapRelatedToEventCards(
+  posts: EventHomePost[],
+  limit = 3
+): EventCard[] {
   const relatedAll: RelatedItem[] = (posts || []).flatMap((p) => p.related || []);
 
   const seen = new Set<number>();
@@ -69,8 +97,10 @@ export function mapRelatedToEventCards(posts: EventHomePost[], limit = 3): Event
       href: pickHref(r),
       image: r.thumbnail || "",
       place: pickPlace(r),
+      placeHref: pickPlaceHref(r),
       title: r.title || "",
       subject: pickSubject(r),
+      subjectHref: pickSubjectHref(r),
     }))
     .filter((x) => !!x.image && !!x.href && !!x.title)
     .slice(0, limit);

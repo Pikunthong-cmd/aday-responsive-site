@@ -1,19 +1,24 @@
 "use client";
 
+import Link from "next/link";
 import { IconFaceBook, IconLine, IconX } from "./Icon";
 import SectionContainer from "./layout/SectionContainer";
 
 type DetailsAndShareProps = {
   date?: string;
   category?: string;
+  categoryHref?: string;
   author?: string;
+  authorHref?: string;
   photographer?: string;
 };
 
 export default function DetailsAndShare({
   date = "",
   category = "",
+  categoryHref = "",
   author = "",
+  authorHref = "",
   photographer = "-",
 }: DetailsAndShareProps) {
   const currentUrl =
@@ -45,26 +50,40 @@ export default function DetailsAndShare({
     );
   };
 
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(currentUrl);
-    } catch {}
-  };
-
   return (
     <SectionContainer padded className="py-4">
-      <div className="border-b border-black/10 pb-4 subtitle">
+      <div className="subtitle border-b border-black/10 pb-4">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="text-black/70">{date}</div>
 
           <div className="uppercase tracking-wide text-black/80">
-            {category}
+            {categoryHref ? (
+              <Link
+                href={categoryHref}
+                className="cursor-pointer transition-colors duration-300 hover:text-[#FE552C]"
+              >
+                {category}
+              </Link>
+            ) : (
+              category
+            )}
           </div>
 
-          <div className="text-black/70 leading-5">
+          <div className="leading-5 text-black/70">
             <div>
-              AUTHOR: <span className="text-black/80">{author}</span>
+              AUTHOR:{" "}
+              {authorHref ? (
+                <Link
+                  href={authorHref}
+                  className="cursor-pointer text-black/80 transition-colors duration-300 hover:text-[#FE552C]"
+                >
+                  {author}
+                </Link>
+              ) : (
+                <span className="text-black/80">{author}</span>
+              )}
             </div>
+
             <div>
               PHOTOGRAPHER:{" "}
               <span className="text-black/80">{photographer}</span>
@@ -77,7 +96,7 @@ export default function DetailsAndShare({
             <button
               type="button"
               onClick={shareFacebook}
-              className="grid place-items-center cursor-pointer hover:opacity-70 transition"
+              className="grid cursor-pointer place-items-center transition hover:opacity-70"
             >
               <IconFaceBook width={18} height={18} />
             </button>
@@ -85,7 +104,7 @@ export default function DetailsAndShare({
             <button
               type="button"
               onClick={shareX}
-              className="grid place-items-center cursor-pointer hover:opacity-70 transition"
+              className="grid cursor-pointer place-items-center transition hover:opacity-70"
             >
               <IconX width={18} height={18} />
             </button>
@@ -93,18 +112,10 @@ export default function DetailsAndShare({
             <button
               type="button"
               onClick={shareLine}
-              className="grid place-items-center cursor-pointer hover:opacity-70 transition"
+              className="grid cursor-pointer place-items-center transition hover:opacity-70"
             >
               <IconLine width={18} height={18} />
             </button>
-
-            {/* <button
-              type="button"
-              onClick={copyLink}
-              className="text-xs underline ml-2"
-            >
-              Copy link
-            </button> */}
           </div>
         </div>
       </div>

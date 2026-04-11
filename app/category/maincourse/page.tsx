@@ -1,34 +1,52 @@
 import ArtistTalkSection from "@/components/artist-talk/ArtistTalkSection";
 import HeroCategory from "@/components/layout/HeroCategory";
 import { categoryFeedAPI } from "@/src/api/category-feed";
+import { tagsAPI } from "@/src/api/tags";
 import { notFound } from "next/navigation";
 
-type Params = { slug: string };
 const PAGE_SIZE = 8;
 
-const SLUG_MAP: Record<string, string> = {
-  "people-power-life": "people-power-life",
+type MainCourseTag = {
+  id: number;
+  name: string;
+  slug: string;
+  taxonomy?: string;
+  link?: string;
+  column_image?: {
+    sizes?: {
+      full?: {
+        src?: string;
+      };
+    };
+  };
 };
 
-export default async function MaincourseCategoryPage({
-  params,
-}: {
-  params: Params;
-}) {
-  const routeSlug = params?.slug;
-  if (!routeSlug) notFound();
+function normalizeMainCourseTag(data: any): MainCourseTag | null {
+  if (Array.isArray(data)) {
+    return (data[0] as MainCourseTag) ?? null;
+  }
 
-  const apiSlug = SLUG_MAP[routeSlug] ?? routeSlug;
+  if (data && typeof data === "object") {
+    return data as MainCourseTag;
+  }
 
-  const catRes = await categoryFeedAPI.getCategoryBySlug(apiSlug);
-  const category = Array.isArray(catRes) ? catRes?.[0] : catRes;
-  if (!category) notFound();
+  return null;
+}
 
-  const categoryId: number = category.id;
-  const categoryName: string = (category?.name ?? apiSlug).toUpperCase();
+export default async function MaincoursePage() {
+  const apiSlug = "maincourse";
 
-  const heroImg: string =
-    category?.column_image?.sizes?.full?.src ?? "/images/artist-talk/hero.png";
+  const catRes = await tagsAPI.getMainCourse();
+  const category = normalizeMainCourseTag(catRes);
+
+  if (!category?.id) notFound();
+
+  const categoryId = category.id;
+  const categoryName = (category.name || apiSlug).toUpperCase();
+
+  const heroImg =
+    category.column_image?.sizes?.full?.src ??
+    "/images/artist-talk/hero.png";
 
   const initialPosts = await categoryFeedAPI.getPostsByCategoryId(
     categoryId,

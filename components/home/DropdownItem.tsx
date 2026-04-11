@@ -32,7 +32,7 @@ export default function DropdownItem({
         }`}
         aria-expanded={isOpen}
       >
-        <span>{label}</span>
+        <span className="lowercase">{label}</span>
         <span
           className={`text-xl transition-transform duration-300 ${
             isOpen ? "rotate-180" : "rotate-0"
@@ -55,7 +55,7 @@ export default function DropdownItem({
                 key={`${it.href}-${it.label}`}
                 href={it.href}
                 onClick={onItemClick}
-                className="font-medium text-neutral-900/90 hover:text-[#FE552C] transition-all duration-200 hover:scale-[1.06] origin-center"
+                className="lowercase font-medium text-neutral-900/90 hover:text-[#FE552C] transition-all duration-200 hover:scale-[1.06] origin-center"
               >
                 {it.label}
               </Link>
@@ -66,4 +66,4 @@ export default function DropdownItem({
     </div>
   );
 }
-``
+``;

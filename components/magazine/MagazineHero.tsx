@@ -1,56 +1,50 @@
 import Image from "next/image";
+import Link from "next/link";
 import SectionContainer from "../layout/SectionContainer";
 import { IconTextMagazine } from "../Icon";
 
-export default function MagazineHero() {
+type Props = {
+  item: {
+    title: string;
+    author: string;
+    image: string;
+    href: string;
+  };
+};
+
+export default function MagazineHero({ item }: Props) {
   return (
     <SectionContainer>
-      <div className=" img-hero-mag">
-        <IconTextMagazine className="w-full h-auto" />
+      <div className="img-hero-mag">
+        <IconTextMagazine className="h-auto w-full" />
       </div>
-      <div
-        className="
-          grid gap-6
-          grid-cols-1
-          lg:grid-cols-2
-          bg-black text-white
-          
-        "
-      >
-        {/* image */}
-        <div className="relative aspect-[4/3] ">
-          <Image
-            src="/images/mock/mag-hero.png"
-            alt="A DAY 251"
-            fill
-            className="object-cover"
-          />
+
+      <div className="grid grid-cols-1 gap-6 bg-black text-white lg:grid-cols-2">
+        <div className="relative aspect-[4/3]">
+          <Image src={item.image} alt={item.title} fill className="object-cover" />
         </div>
 
-        {/* content */}
-        <div className="flex flex-col p-6 h-full">
+        <div className="flex h-full flex-col p-6">
           <div>
-            <h1 className="text-2xl lg:text-4xl font-bold">
-              A DAY 251 : NETFLIX
-            </h1>
+            <Link
+              href={item.href}
+              className="text-2xl font-bold leading-tight transition-colors hover:text-[#FE552C] lg:text-4xl"
+            >
+              {item.title}
+            </Link>
           </div>
 
           <div className="mt-auto flex items-end gap-4">
-            <p className="text-sm text-gray-300 leading-relaxed">
-              นักเขียน : A TEAM <br />
-              11/10/2022
+            <p className="text-sm leading-relaxed text-gray-300">
+              นักเขียน : {item.author}
             </p>
 
-            <button
-              className="
-        ml-auto
-        bg-[#FE552C] text-white
-        px-6 py-2
-        text-sm font-semibold
-      "
+            <Link
+              href={item.href}
+              className="ml-auto bg-[#FE552C] px-6 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               MAGAZINE
-            </button>
+            </Link>
           </div>
         </div>
       </div>

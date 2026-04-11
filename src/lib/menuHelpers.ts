@@ -23,12 +23,14 @@ export function sortByOrder<T extends { order?: number }>(arr: T[]) {
 
 export function flattenMenu(items: MenuItem[]): MenuItem[] {
   const out: MenuItem[] = [];
+
   const walk = (nodes: MenuItem[]) => {
     for (const n of nodes) {
       out.push(n);
       if (n.children && n.children.length) walk(n.children);
     }
   };
+
   walk(items);
   return out;
 }
@@ -56,14 +58,12 @@ export function findRootCategoryTitle(item: MenuItem, tree: MenuItem[]): string 
   return current?.title ?? "";
 }
 
-// ✅ รองรับ response จาก API ได้ทั้ง array และ {items:[]}
 export function normalizeMenuResponse(data: any): MenuResponse {
   if (Array.isArray(data)) return { items: data };
   if (Array.isArray(data?.items)) return data as MenuResponse;
   return { items: [] };
 }
 
-// ✅ flatten แบบเอา leaf เท่านั้น (ตัวไม่มี children) + กันซ้ำ + เรียง order
 export function flattenLeaves(nodes: MenuItem[]): MenuItem[] {
   const out: MenuItem[] = [];
   const seen = new Set<number>();

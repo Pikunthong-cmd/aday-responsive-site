@@ -11,4 +11,9 @@ export const tagsAPI = {
     const res = await adayApiClientV2.get("/tags?slug=EVENT");
     return res.data;
   },
+
+  getMainCourse: async () => {
+    const res = await adayApiClientV2.get("/tags?slug=maincourse");
+    return res.data;
+  },
 };

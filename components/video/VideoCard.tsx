@@ -22,7 +22,6 @@ export default function VideoCard({ item, variant = "highlight" }: Props) {
 
   useEffect(() => {
     setImgSrc(item.image || FALLBACK_IMAGE_SRC);
-    console.log(item);
   }, [item.image]);
 
   const buildVideoHref = (href?: string) => {

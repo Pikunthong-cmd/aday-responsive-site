@@ -55,7 +55,6 @@ export default function VideoPage() {
         if (!rootId) return;
 
         const catsRes = await videoAPI.getVideoById(rootId);
-        console.log(catsRes)
         const categories = pickArray(catsRes);
         const mapped = mapCategories(categories);
 
@@ -66,9 +65,6 @@ export default function VideoPage() {
         if (!cancelled) setLoading(false);
       }
     })();
-
-    console.log(pickCatImage)
-
 
     return () => {
       cancelled = true;

@@ -24,6 +24,8 @@ type CardItem = {
   subtitle: string;
   link: string;
   categoryName?: string;
+  authorId?: number | string;
+  authorSlug?: string;
 };
 
 function stripHtml(input: string) {
@@ -48,6 +50,12 @@ function mapToCardItems(raw: any[], categoryName?: string): CardItem[] {
       const height = Number(it?.opengraph_image?.height);
       const subtitle = it?.author_detail?.name || "";
 
+      const authorId = it?.author_detail?.id;
+      const authorNuxtlink = String(it?.author_detail?.nuxtlink || "").trim();
+      const authorSlug = authorNuxtlink
+        ? authorNuxtlink.replace(/^\/|\/$/g, "").split("/").pop()
+        : "";
+
       if (!id || !title || !slug) return null;
 
       return {
@@ -60,6 +68,8 @@ function mapToCardItems(raw: any[], categoryName?: string): CardItem[] {
         subtitle,
         link,
         categoryName,
+        authorId,
+        authorSlug,
       };
     })
     .filter(Boolean) as CardItem[];

@@ -10,7 +10,7 @@ const SLUG_MAP: Record<string, string> = {
   "people-power-life": "people-power-life",
 };
 
-export default async function MaincourseCategoryPage({
+export default async function WakeUpCategoryPage({
   params,
 }: {
   params: Params; 

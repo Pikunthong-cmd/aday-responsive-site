@@ -1,5 +1,3 @@
-// src/lib/postsVideoHomeHelpers.ts
-
 export type RelatedItem = {
   id: number;
   title?: string;
