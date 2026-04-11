@@ -10,6 +10,7 @@ import FullScreenMenu from "../FullScreenMenu";
 import { themeFromPathname } from "../constants/headerThemeRouteMap";
 import { HEADER_THEME_CLASS } from "../constants/headerTheme";
 import SearchOverlay from "./SearchOverlay";
+import GTranslateSwitcher from "./GTranslateSwitcher";
 import HeaderMenuRive from "../HeaderLogoRive";
 
 export default function Header() {
@@ -59,7 +60,8 @@ export default function Header() {
 
           {/* ACTIONS */}
           <div className="flex items-center gap-4">
-            {/* SEARCH */}
+            <GTranslateSwitcher />
+
             <button
               type="button"
               aria-label="Search"
