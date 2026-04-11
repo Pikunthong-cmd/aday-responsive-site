@@ -1,6 +1,7 @@
 import ColumnBodyLayout from "@/components/column/ColumnBodyLayout";
 import ColumnHeroCover from "@/components/column/ColumnHeroCover";
 import DetailsAndShare from "@/components/DetailsAndShare";
+import DetailsPost from "@/components/DetailsPost";
 import RelatedPosts from "@/components/ui/RelatedPosts";
 import { postsAPI } from "@/src/api/posts";
 
@@ -42,7 +43,12 @@ function toAuthorPath(authorSlug?: string, authorId?: number | string) {
 function getAuthorSlugFromNuxtlink(nuxtlink?: string) {
   const p = String(nuxtlink || "").trim();
   if (!p) return "";
-  return p.replace(/^\/+|\/+$/g, "").split("/").pop() || "";
+  return (
+    p
+      .replace(/^\/+|\/+$/g, "")
+      .split("/")
+      .pop() || ""
+  );
 }
 
 function pickImage(p: any) {
@@ -65,9 +71,11 @@ function pickPlace(p: any) {
   const pc = p?.primary_category?.[0];
   if (pc?.name && pc?.nuxtlink) return { text: pc.name, href: pc.nuxtlink };
   const last = p?.category?.[p?.category?.length - 1];
-  if (last?.name && last?.nuxtlink) return { text: last.name, href: last.nuxtlink };
+  if (last?.name && last?.nuxtlink)
+    return { text: last.name, href: last.nuxtlink };
   const first = p?.category?.[0];
-  if (first?.name && first?.nuxtlink) return { text: first.name, href: first.nuxtlink };
+  if (first?.name && first?.nuxtlink)
+    return { text: first.name, href: first.nuxtlink };
   return { text: "", href: "" };
 }
 
@@ -139,6 +147,7 @@ export default async function PostPage(props: {
   if (!slug) return <div className="p-6">Invalid slug</div>;
 
   const res = await postsAPI.getPostBySlug(slug);
+  console.log(res);
   const post = Array.isArray(res) ? res[0] : res;
   if (!post) return <div className="p-6">Post not found</div>;
 
@@ -164,12 +173,40 @@ export default async function PostPage(props: {
 
   const photographer = post?.photographer_detail?.name || "-";
 
+  const detailTags =
+    post?.data?.tags?.map((tag: any) => ({
+      label: tag?.name || "",
+      href: tag?.slug ? `/tag/${tag.slug}` : "",
+    })) || [];
+
+  const detailAuthor = {
+    name: post?.author_detail?.name || "-",
+    href: authorHref,
+    bio:
+      post?.yoast_head_json?.schema?.["@graph"]?.find(
+        (item: any) => item?.["@type"] === "Person",
+      )?.description || "",
+    avatar:
+      post?.yoast_head_json?.schema?.["@graph"]?.find(
+        (item: any) => item?.["@type"] === "Person",
+      )?.image?.url || "",
+  };
+
+  const detailPhotographer = {
+    name: post?.photographer_detail?.name || "-",
+    href: "",
+    bio: post?.photographer_detail?.description || "",
+    avatar: post?.photographer_detail?.avatar || "",
+  };
+
   const relatedRaw =
     (Array.isArray(post?.related) && post.related) ||
     (Array.isArray(post?.related_posts) && post.related_posts) ||
     (Array.isArray(res) && res.length > 1 ? res : []);
 
-  const related = mapRelated(relatedRaw).filter((x) => x.postHref !== `/post/${slug}`);
+  const related = mapRelated(relatedRaw).filter(
+    (x) => x.postHref !== `/post/${slug}`,
+  );
 
   return (
     <main>
@@ -183,6 +220,11 @@ export default async function PostPage(props: {
         photographer={photographer}
       />
       <ColumnBodyLayout content={content} />
+      <DetailsPost
+        tags={detailTags}
+        author={detailAuthor}
+        photographer={detailPhotographer}
+      />
       <RelatedPosts items={related} />
     </main>
   );

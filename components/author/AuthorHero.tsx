@@ -63,7 +63,7 @@ export default function AuthorHero({
               </div>
             )}
 
-            <div className="mt-8 flex gap-12">
+            {/* <div className="mt-8 flex gap-12">
               <div>
                 <div className="text-[36px] font-semibold">{totalPosts}</div>
                 <div className="text-[12px] text-white/60">บทความ</div>
@@ -73,7 +73,7 @@ export default function AuthorHero({
                 <div className="text-[36px] font-semibold">{since}</div>
                 <div className="text-[12px] text-white/60">ปีที่เขียน</div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* RIGHT */}

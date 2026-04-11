@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { IconFaceBook, IconLine, IconX } from "./Icon";
+import { IconFaceBook, IconInstagram, IconLine, IconX } from "./Icon";
 import SectionContainer from "./layout/SectionContainer";
 
 type DetailsAndShareProps = {
@@ -21,8 +21,7 @@ export default function DetailsAndShare({
   authorHref = "",
   photographer = "-",
 }: DetailsAndShareProps) {
-  const currentUrl =
-    typeof window !== "undefined" ? window.location.href : "";
+  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
 
   const encodedUrl = encodeURIComponent(currentUrl);
 
@@ -30,7 +29,7 @@ export default function DetailsAndShare({
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
       "_blank",
-      "noopener,noreferrer"
+      "noopener,noreferrer",
     );
   };
 
@@ -38,7 +37,7 @@ export default function DetailsAndShare({
     window.open(
       `https://twitter.com/intent/tweet?url=${encodedUrl}`,
       "_blank",
-      "noopener,noreferrer"
+      "noopener,noreferrer",
     );
   };
 
@@ -46,8 +45,12 @@ export default function DetailsAndShare({
     window.open(
       `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`,
       "_blank",
-      "noopener,noreferrer"
+      "noopener,noreferrer",
     );
+  };
+
+  const shareInstagram = async () => {
+    window.open("https://www.instagram.com/", "_blank");
   };
 
   return (
@@ -84,10 +87,10 @@ export default function DetailsAndShare({
               )}
             </div>
 
-            <div>
+            {/* <div>
               PHOTOGRAPHER:{" "}
               <span className="text-black/80">{photographer}</span>
-            </div>
+            </div> */}
           </div>
 
           <div className="flex items-center gap-3">
@@ -115,6 +118,13 @@ export default function DetailsAndShare({
               className="grid cursor-pointer place-items-center transition hover:opacity-70"
             >
               <IconLine width={18} height={18} />
+            </button>
+            <button
+              type="button"
+              onClick={shareInstagram}
+              className="grid cursor-pointer place-items-center transition hover:opacity-70"
+            >
+              <IconInstagram width={18} height={18} />
             </button>
           </div>
         </div>

@@ -217,37 +217,35 @@ export default function FullScreenMenu({ open, onClose }: Props) {
           </nav>
 
           <div className="w-full overflow-hidden py-6">
-            {/*
-  <div
-    className="flex w-max"
-    style={{ animation: "menu-scroll 50s linear infinite" }}
-    onMouseEnter={(e) =>
-      (e.currentTarget.style.animationPlayState = "paused")
-    }
-    onMouseLeave={(e) =>
-      (e.currentTarget.style.animationPlayState = "running")
-    }
-  >
-    <img
-      src="/images/menu-strip.png"
-      alt="Menu strip"
-      className="h-40 select-none object-cover pointer-events-none"
-    />
-    <img
-      src="/images/menu-strip.png"
-      alt=""
-      className="h-40 select-none object-cover pointer-events-none"
-    />
-  </div>
-  */}
+            <div
+              className="flex w-max"
+              style={{ animation: "menu-scroll 50s linear infinite" }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.animationPlayState = "paused")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.animationPlayState = "running")
+              }
+            >
+              <img
+                src="/images/menu-strip.jpg"
+                alt="Menu strip"
+                className="h-40 select-none object-cover pointer-events-none"
+              />
+              <img
+                src="/images/menu-strip.jpg"
+                alt=""
+                className="h-40 select-none object-cover pointer-events-none"
+              />
+            </div>
 
-            <div className="w-full">
+            {/* <div className="w-full">
               <img
                 src="/images/menu-strip.jpg"
                 alt="Menu strip"
                 className="h-40 w-full select-none object-cover pointer-events-none"
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="flex w-full flex-wrap justify-center gap-6 pb-10 uppercase mt-6">

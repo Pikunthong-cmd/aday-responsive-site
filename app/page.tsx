@@ -93,6 +93,7 @@ export default function Home() {
         }
 
         setVideoCards(mapRelatedToCards(postsRes, 3));
+        console.log(postsRes)
       } catch (e) {
         console.error("Failed to load home sections", e);
       } finally {
@@ -176,7 +177,6 @@ export default function Home() {
         linkUrl={banner?.linkUrl}
         videoCards={videoCards}
       />
-
       <Category items={buildCategoryCardsFromMenu(menu)} />
       <Event items={eventItems} />
     </div>

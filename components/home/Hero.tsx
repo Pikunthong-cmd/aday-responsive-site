@@ -18,6 +18,44 @@ type HeroProps = {
   initialIndex?: number;
 };
 
+function normalizeCategoryKey(value?: string) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+const CATEGORY_COLOR_MAP: Record<string, string> = {
+  // People
+  "qandaday": "#ead50d",
+  "people power": "#ead50d",
+  founder: "#ead50d",
+  relationships: "#ead50d",
+
+  // Art & Design
+  "artist talk": "#ff4500",
+  "draft till done": "#ff4500",
+  portfolio: "#ff4500",
+
+  // Life & Culture
+  "a better day": "#9ac2ff",
+  "see saw scene": "#9ac2ff",
+  "ที่ชอบ": "#9ac2ff",
+  "ตามไปดู": "#9ac2ff",
+  "witch a boo": "#9ac2ff",
+  "บันทึกการอ่าน": "#9ac2ff",
+  "photo stories": "#9ac2ff",
+  heartsell: "#9ac2ff",
+
+  // Others
+  "live in a day": "#9bd941",
+  "a doc": "#9bd941",
+  "day for night": "#9bd941",
+  agenda: "#9bd941",
+};
+
 export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
   const safeSlides = useMemo(() => slides ?? [], [slides]);
 
@@ -84,6 +122,10 @@ export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
   const activeLink =
     typeof active.link === "string" && active.link.trim() ? active.link : "";
 
+  const themeColor =
+  CATEGORY_COLOR_MAP[normalizeCategoryKey(active.title)] || "#097B55";
+
+
   return (
     <section className="w-full">
       <div className="relative w-full overflow-hidden aspect-[16/9]">
@@ -129,12 +171,32 @@ export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
             {activeLink ? (
               <Link
                 href={activeLink}
-                className="inline-flex cursor-pointer items-center rounded-full border border-[#097B55] bg-[#097B55]/15 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-[#097B55] transition-colors duration-300 hover:bg-[#097B55] hover:text-white md:px-5 md:py-2"
+                className="inline-flex cursor-pointer items-center rounded-full border px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 md:px-5 md:py-2"
+                style={{
+                  borderColor: themeColor,
+                  backgroundColor: `${themeColor}26`, // 15% opacity
+                  color: themeColor,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = themeColor;
+                  e.currentTarget.style.color = "#fff";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = `${themeColor}26`;
+                  e.currentTarget.style.color = themeColor;
+                }}
               >
                 {active.title}
               </Link>
             ) : (
-              <div className="inline-flex items-center rounded-full border border-[#097B55] bg-[#097B55]/15 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-[#097B55] md:px-5 md:py-2">
+              <div
+                className="inline-flex items-center rounded-full border px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] md:px-5 md:py-2"
+                style={{
+                  borderColor: themeColor,
+                  backgroundColor: `${themeColor}26`,
+                  color: themeColor,
+                }}
+              >
                 {active.title}
               </div>
             )}
