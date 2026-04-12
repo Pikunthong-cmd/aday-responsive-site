@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import SectionContainer from "../layout/SectionContainer";
 import "@/src/styles/wordpress-content.min.css";
 import "@/src/styles/text-content.css";
-
+import "@/src/styles/aday-article.css";
 
 type Props = {
   content: string;
@@ -12,8 +12,18 @@ type Props = {
 
 function sanitizeContent(html: string) {
   return (html || "")
+    .replace(/&#8220;>/gi, "“")
+    .replace(/&quot;>/gi, '"')
+    .replace(/&gt;/gi, ">")
     .replace(/<strong>\s*<\/strong>/gi, "")
     .replace(/<p>\s*(?:&nbsp;|\u00A0)?\s*<\/p>/gi, "")
+    .replace(/<blockquote>\s*<\/blockquote>/gi, "")
+    .replace(/<p[^>]*>\s*>\s*<\/p>/gi, "")
+    .replace(/<p[^>]*>\s*&gt;\s*<\/p>/gi, "")
+    .replace(/<blockquote>\s*<p[^>]*>\s*>\s*<\/p>\s*<\/blockquote>/gi, "")
+    .replace(/<blockquote>\s*<p[^>]*>\s*&gt;\s*<\/p>\s*<\/blockquote>/gi, "")
+    .replace(/(<(p|strong|h2|h3|h4)[^>]*>\s*)>\s*/gi, "$1")
+    .replace(/>\s*</g, "><")
     .trim();
 }
 
@@ -33,20 +43,16 @@ export default function ColumnBodyLayout({ content }: Props) {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes imgFade {
-          from { opacity: 0; transform: translateY(6px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
       `}</style>
 
       <div
         className={[
-          "mx-auto max-w-3xl",
+          "mx-auto w-full max-w-[760px]",
           mounted ? "[animation:fadeUp_520ms_ease-out_both]" : "opacity-0",
         ].join(" ")}
       >
         <article
-          className="wp-content text-black/85"
+          className="wp-content aday-article-body text-black/85"
           dangerouslySetInnerHTML={{ __html: safe }}
         />
       </div>

@@ -1,11 +1,10 @@
 import { IconLogoBlack } from "../Icon";
-import { Play } from "lucide-react";
 
 type VideoHomeItem = {
   id: number;
   title: string;
-  href: string; // ใช้ nuxtlink
-  image: string; // image url (remote)
+  href: string;
+  video: string;
 };
 
 type ExperimentalProps = {
@@ -20,8 +19,9 @@ export default function Experimental({
   videoCards = [],
 }: ExperimentalProps) {
   const href = linkUrl || "/";
+
   return (
-    <section className="w-full my-5">
+    <section className="my-5 w-full">
       {/* HERO VIDEO */}
       {bannerVideo ? (
         <a
@@ -40,10 +40,11 @@ export default function Experimental({
             ) as HTMLElement | null;
             el?.removeAttribute("data-active");
           }}
-          target="blank"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <video
-            className="w-full h-auto object-cover cursor-none"
+            className="h-auto w-full cursor-none object-cover"
             autoPlay
             muted
             loop
@@ -54,11 +55,11 @@ export default function Experimental({
           </video>
         </a>
       ) : (
-        <div className="w-full aspect-[16/9] bg-black/10" />
+        <div className="aspect-[16/9] w-full bg-black/10" />
       )}
 
-      <div className="xl:p-40 p-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+      <div className="p-20 xl:p-40">
+        <div className="grid grid-cols-1 items-start gap-10 md:grid-cols-2">
           {/* Left */}
           <div>
             <IconLogoBlack />
@@ -66,59 +67,62 @@ export default function Experimental({
 
           {/* Right */}
           <div className="space-y-6">
-            <h2 className="text-xl md:text-2xl font-extrabold uppercase h3">
+            <h2 className="h3 text-xl font-extrabold uppercase md:text-2xl">
               a day is an inspiring for all generation
             </h2>
 
             <div>
               <h3 className="text-lg font-bold uppercase">idea</h3>
-              <p className="text-base md:text-lg font-light lowercase">
+              <p className="text-base font-light lowercase md:text-lg">
                 creativity that sparks inspiration.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-bold uppercase">somebody</h3>
-              <p className="text-base md:text-lg font-light lowercase">
+              <p className="text-base font-light lowercase md:text-lg">
                 ordinary people with something extraordinary.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-bold uppercase">nostalgia</h3>
-              <p className="text-base md:text-lg font-light lowercase">
+              <p className="text-base font-light lowercase md:text-lg">
                 stories of the past that still linger in the present.
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-1">
+        <div className="mt-12 grid grid-cols-1 gap-1 md:grid-cols-3">
           {videoCards.map((item) => (
             <a
               key={item.id}
               href={item.href}
               className="group relative block w-full overflow-hidden"
               aria-label={item.title}
-              target="blank"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <div className="aspect-video w-full bg-black/10">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                  loading="lazy"
-                />
+                <video
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                >
+                  <source src={item.video} type="video/mp4" />
+                </video>
               </div>
 
               <div className="pointer-events-none absolute inset-0 grid place-items-center">
-                <div className="rounded-full bg-black/55 backdrop-blur-sm p-3 transition-transform duration-200 group-hover:scale-105">
-                  <span className="block w-0 h-0 border-y-8 border-y-transparent border-l-[14px] border-l-white ml-1" />
+                <div className="rounded-full bg-black/55 p-3 backdrop-blur-sm transition-transform duration-200 group-hover:scale-105">
+                  <span className="ml-1 block h-0 w-0 border-y-8 border-y-transparent border-l-[14px] border-l-white" />
                 </div>
               </div>
 
-              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
-              </div>
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3" />
             </a>
           ))}
         </div>

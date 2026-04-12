@@ -162,14 +162,14 @@ export default function GTranslateSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex items-center justify-center"
+        className="flex items-center justify-center cursor-pointer"
         aria-label="Change language"
       >
-        <GlobeIcon size={24} />
+        <GlobeIcon size={30} />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-[120px] overflow-hidden rounded-lg bg-white shadow-lg">
+        <div className="absolute right-0 top-full z-50 mt-2 w-[120px] overflow-hidden rounded-lg bg-white shadow-lg ">
           <button type="button" onClick={() => changeLang("th")} className={itemClass("th")}>
             ไทย
           </button>
