@@ -37,15 +37,16 @@ export default function ColumnBodyLayout({ content }: Props) {
   }, []);
 
   return (
-    <SectionContainer className="py-8 lg:py-10 px-0">
+    <SectionContainer className="py-6 sm:py-8 lg:py-10">
       <div
         className={[
-          "w-full max-w-[1280px] mx-auto",
+          "mx-auto w-full max-w-[1280px]",
+          "px-4 sm:px-6 md:px-8 lg:px-0",
           mounted ? "[animation:fadeUp_520ms_ease-out_both]" : "opacity-0",
         ].join(" ")}
       >
         <article
-          className="wp-content aday-article-body text-black/85 px-0"
+          className="wp-content aday-article-body text-black/85"
           dangerouslySetInnerHTML={{ __html: safe }}
         />
       </div>
