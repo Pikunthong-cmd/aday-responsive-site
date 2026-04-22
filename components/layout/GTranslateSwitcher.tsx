@@ -42,10 +42,37 @@ function GlobeIcon({ size = 20 }: { size?: number }) {
   );
 }
 
-function setGTranslateCookie(lang: Lang) {
-  const value = lang === "en" ? "/th/en" : "/th/th";
-  document.cookie = `googtrans=${value}; path=/`;
-  document.cookie = `googtrans=${value}; domain=${window.location.hostname}; path=/`;
+function getRootDomain(hostname: string) {
+  const parts = hostname.split(".");
+  if (parts.length <= 2) return hostname;
+  return parts.slice(-2).join(".");
+}
+
+function setCookie(name: string, value: string, domain?: string) {
+  const domainPart = domain ? ` domain=${domain};` : "";
+  document.cookie = `${name}=${value}; path=/;${domainPart}`;
+}
+
+function deleteCookie(name: string, domain?: string) {
+  const domainPart = domain ? ` domain=${domain};` : "";
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;${domainPart}`;
+}
+
+function setGTranslateLanguage(lang: Lang) {
+  const hostname = window.location.hostname;
+  const rootDomain = getRootDomain(hostname);
+
+  if (lang === "en") {
+    const value = "/th/en";
+    setCookie("googtrans", value);
+    setCookie("googtrans", value, hostname);
+    if (rootDomain !== hostname) setCookie("googtrans", value, `.${rootDomain}`);
+    return;
+  }
+
+  deleteCookie("googtrans");
+  deleteCookie("googtrans", hostname);
+  if (rootDomain !== hostname) deleteCookie("googtrans", `.${rootDomain}`);
 }
 
 export default function GTranslateSwitcher() {
@@ -79,7 +106,7 @@ export default function GTranslateSwitcher() {
 
     if (lang === activeLang) return;
 
-    setGTranslateCookie(lang);
+    setGTranslateLanguage(lang);
     localStorage.setItem(STORAGE_KEY, lang);
     setActiveLang(lang);
 
@@ -95,7 +122,6 @@ export default function GTranslateSwitcher() {
 
   return (
     <div className="relative">
-      {/* hidden gtranslate mount point */}
       <div
         className="pointer-events-none absolute left-0 top-0 h-0 w-0 overflow-hidden opacity-0"
         aria-hidden="true"
