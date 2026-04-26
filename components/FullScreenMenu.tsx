@@ -33,10 +33,10 @@ export type MenuResponse = {
 };
 
 const bottomLinks = [
-  { label: "Shop", href: "/shop" },
+  { label: "Shop", href: "/" },
   { label: "Support us", href: "/support-us" },
   { label: "Magazine", href: "/a-day-magazine" },
-  { label: "Newsletters", href: "/newsletters" },
+  { label: "Newsletters", href: "#" },
   { label: "Podcast", href: "/podcast" },
   { label: "Video", href: "/video" },
   { label: "About Us", href: "/about-us" },

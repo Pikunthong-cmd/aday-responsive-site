@@ -46,7 +46,13 @@ function PageImage({
     <div className="page-inner">
       <div className="paper">
         {src ? (
-          <Image src={src} alt={alt} fill className="object-contain" priority={priority} />
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            className="object-contain"
+            priority={priority}
+          />
         ) : (
           <div className="w-full h-full bg-[#fbfaf5]" />
         )}
@@ -74,7 +80,8 @@ export default function MagazineBookReader({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const { ref: bookAreaRef, size: bookAreaSize } = useElementSize<HTMLDivElement>();
+  const { ref: bookAreaRef, size: bookAreaSize } =
+    useElementSize<HTMLDivElement>();
 
   const contentPages = useMemo(() => pages.filter(Boolean), [pages]);
 
@@ -97,7 +104,9 @@ export default function MagazineBookReader({
     ? Math.max(280, Math.min(420, maxStageWidth - 16))
     : Math.max(300, Math.min(420, Math.floor((maxStageWidth - 16) / 2)));
 
-  const pageHeight = isMobile ? Math.round(pageWidth * 1.45) : Math.round(pageWidth * 1.38);
+  const pageHeight = isMobile
+    ? Math.round(pageWidth * 1.45)
+    : Math.round(pageWidth * 1.38);
 
   const onPrev = () => bookRef.current?.pageFlip()?.flipPrev();
   const onNext = () => bookRef.current?.pageFlip()?.flipNext();
@@ -109,12 +118,14 @@ export default function MagazineBookReader({
           <h2 className="text-lg font-bold mb-4">LATEST</h2>
 
           <div className="flex lg:flex-col gap-4">
-            <div className="relative w-16 h-16 lg:w-24 lg:h-24 bg-gray-100 overflow-hidden">
+            <div className="relative bg-gray-100 overflow-hidden">
               <Image
                 src={contentPages[0] || coverImage}
                 alt={title}
-                fill
-                className="object-cover"
+                width={0}
+                height={0}
+                sizes="100vw"
+                className="w-auto h-auto max-w-full object-contain"
               />
             </div>
 
@@ -162,7 +173,11 @@ export default function MagazineBookReader({
                         key={`${src}-${i}`}
                         className={`page ${isCover || isBackCover ? "page-hard" : ""}`}
                       >
-                        <PageImage src={src || undefined} alt={`Page ${i + 1}`} priority={i <= 2} />
+                        <PageImage
+                          src={src || undefined}
+                          alt={`Page ${i + 1}`}
+                          priority={i <= 2}
+                        />
                       </div>
                     );
                   })}
@@ -241,7 +256,10 @@ export default function MagazineBookReader({
           justify-content: center;
           border-radius: 9999px;
           color: rgba(0, 0, 0, 0.4);
-          transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+          transition:
+            background 160ms ease,
+            color 160ms ease,
+            transform 160ms ease;
           user-select: none;
         }
 
