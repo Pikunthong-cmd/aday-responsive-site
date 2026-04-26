@@ -4,19 +4,22 @@ import { useRive } from "@rive-app/react-canvas";
 
 export default function HeaderMenuRive({
   onClick,
+  variant = "default",
 }: {
   onClick: () => void;
+  variant?: "default" | "white";
 }) {
+  const src = variant === "white" ? "/icon-aday-white.riv" : "/icon-aday.riv";
+
   const { RiveComponent, rive } = useRive({
-    src: "/icon-aday.riv",
-    autoplay: false, 
+    src,
+    autoplay: false,
   });
 
   const handleEnter = () => {
     if (!rive) return;
     rive.stop();
-    rive.play("hover"); 
-    console.log(rive?.animationNames);
+    rive.play("hover");
   };
 
   const handleLeave = () => {
@@ -24,7 +27,6 @@ export default function HeaderMenuRive({
     rive.stop();
     rive.play("hover re");
   };
-  
 
   return (
     <button

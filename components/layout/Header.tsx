@@ -22,11 +22,7 @@ export default function Header() {
 
   const bgClass = HEADER_THEME_CLASS[theme];
 
-  const darkThemes = [
-    "bg-black",
-    "bg-[#252872]",
-    "bg-[#5F1B13]",
-  ];
+  const darkThemes = ["bg-black", "bg-[#252872]", "bg-[#5F1B13]"];
 
   const isDarkBg = darkThemes.includes(bgClass);
 
@@ -74,6 +70,7 @@ export default function Header() {
             {/* MENU */}
             <HeaderMenuRive
               onClick={() => setOpen(true)}
+              variant={bgClass === "bg-black" ? "default" : "white"}
             />
 
             <FullScreenMenu open={open} onClose={() => setOpen(false)} />
