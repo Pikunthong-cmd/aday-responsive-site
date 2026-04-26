@@ -12,7 +12,7 @@ export const postsAPI = {
   },
 
   getEventHome: async (tagId:any) => {
-    const res = await adayApiClientV2.get(`posts?tags=${tagId}&per_page=3&page=1`);
+    const res = await adayApiClientV2.get(`posts?categories=${tagId}&per_page=3&page=1`);
     return res.data;
   },
 

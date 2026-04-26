@@ -122,10 +122,13 @@ export default function Home() {
         setLoadingEvents(true);
 
         const tags = (await tagsAPI.getEvent()) as EventTag[];
-        const tagId = findEventTagId(tags);
+        const tagId = tags[0].id;
+        console.log("tag",tagId)
+
         if (!tagId) return;
 
         const posts = (await postsAPI.getEventHome(tagId)) as EventHomePost[];
+        console.log(">>>>>>",posts)
         if (!mounted) return;
 
         setEventItems(mapRelatedToEventCards(posts, 3));

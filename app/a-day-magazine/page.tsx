@@ -13,6 +13,8 @@ export default async function MagazinePage() {
 
   if (firstCategoryId) {
     postsRes = await aDayMagazineAPI.getCategoriesById(firstCategoryId);
+    console.log("<<<<<<",firstCategoryId)
+    console.log(">>>>>>>",postsRes)
   }
 
   return (
