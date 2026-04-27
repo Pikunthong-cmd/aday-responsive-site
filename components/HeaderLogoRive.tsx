@@ -30,6 +30,7 @@ export default function HeaderMenuRive({
 
   return (
     <button
+      key={src}
       type="button"
       onClick={onClick}
       aria-label="Open menu"

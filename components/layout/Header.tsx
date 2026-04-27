@@ -69,6 +69,7 @@ export default function Header() {
 
             {/* MENU */}
             <HeaderMenuRive
+              key={bgClass === "bg-black" ? "default-rive" : "white-rive"}
               onClick={() => setOpen(true)}
               variant={bgClass === "bg-black" ? "default" : "white"}
             />
