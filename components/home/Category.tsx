@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export type CategoryCard = {
-  category: "shop" | "podcast" | "nostalgia";
+  category: "shop" | "podcast" | "series";
   title: string;
   image: string;
   href: string;
