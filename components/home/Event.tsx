@@ -6,6 +6,7 @@ type Props = {
 };
 
 export default function Event({ items }: Props) {
+  console.log("EVENT ITEMS >>>", items);
   return (
     <section className="w-full">
       <div className="p-6 xl:p-40">
@@ -43,7 +44,7 @@ export default function Event({ items }: Props) {
                     href={item.placeHref || "#"}
                     className="block text-xs tracking-widest text-black transition-colors duration-300 hover:text-[#FE552C]"
                   >
-                    {item.place}
+                    {item.category[0].name}
                   </Link>
                 ) : null}
 

@@ -16,7 +16,7 @@ const mainPages = [
   { label: "PODCAST", href: "/podcast" },
   { label: "SERIES", href: "/series" },
   { label: "MAGAZINE", href: "/a-day-magazine" },
-  { label: "ACTIVITIES", href: "/" },
+  { label: "ACTIVITIES", href: "/category/activities" },
 ];
 
 const utilityPages = [
@@ -29,7 +29,6 @@ const socialLinks = [
   { label: "Facebook", href: "https://www.facebook.com/adaymagazine", Icon: IconFacebook },
   { label: "Instagram", href: "https://www.instagram.com/adaymagazine/", Icon: IconIG },
   { label: "Spotify", href: "https://open.spotify.com/show/5hOCAyn56XoSkLq0PyoreZ?si=8d267bdf705243cf", Icon: IconSpotify },
-  // { label: "TikTok", href: "#", Icon: IconTiktok },
   { label: "X", href: "http://twitter.com/adaymagazine", Icon: IconTwiiter },
   { label: "YouTube", href: "https://www.youtube.com/@adaymagazinechannel", Icon: IconYoutube },
 ];

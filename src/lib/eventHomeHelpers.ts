@@ -4,6 +4,12 @@ export type EventTag = {
   slug?: string;
 };
 
+export type EventCategory = {
+  id: number;
+  name: string;
+  nuxtlink: string;
+};
+
 export type RelatedItem = {
   id: number;
   title: string;
@@ -20,6 +26,7 @@ export type RelatedItem = {
     name?: string;
     nuxtlink?: string;
   }>;
+  category?: EventCategory[];
 };
 
 export type EventHomePost = {
@@ -36,6 +43,7 @@ export type EventCard = {
   title: string;
   subject: string;
   subjectHref: string;
+  category: EventCategory[];
 };
 
 function normalize(s: string) {
@@ -46,6 +54,7 @@ export function findEventTagId(tags: EventTag[]): number | null {
   const t =
     tags.find((x) => normalize(x.slug || "") === "event") ||
     tags.find((x) => normalize(x.name || "") === "event");
+
   return t?.id ?? null;
 }
 
@@ -77,22 +86,36 @@ function pickSubjectHref(r: RelatedItem) {
   return "#";
 }
 
+function pickCategory(r: RelatedItem): EventCategory[] {
+  return Array.isArray(r.category)
+    ? r.category.map((c) => ({
+        id: c.id,
+        name: c.name,
+        nuxtlink: c.nuxtlink,
+      }))
+    : [];
+}
+
 export function mapRelatedToEventCards(
   posts: EventHomePost[],
   limit = 3
 ): EventCard[] {
-  const relatedAll: RelatedItem[] = (posts || []).flatMap((p) => p.related || []);
+  const relatedAll: RelatedItem[] = (posts || []).flatMap(
+    (p) => p.related || []
+  );
 
   const seen = new Set<number>();
+
   const uniq = relatedAll.filter((r) => {
     if (!r?.id) return false;
     if (seen.has(r.id)) return false;
+
     seen.add(r.id);
     return true;
   });
 
   return uniq
-    .map((r) => ({
+    .map((r): EventCard => ({
       id: r.id,
       href: pickHref(r),
       image: r.thumbnail || "",
@@ -101,6 +124,7 @@ export function mapRelatedToEventCards(
       title: r.title || "",
       subject: pickSubject(r),
       subjectHref: pickSubjectHref(r),
+      category: pickCategory(r),
     }))
     .filter((x) => !!x.image && !!x.href && !!x.title)
     .slice(0, limit);
