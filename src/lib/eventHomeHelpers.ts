@@ -1,131 +1,113 @@
-export type EventTag = {
+export type EventCardCategory = {
   id: number;
   name: string;
-  slug?: string;
-};
-
-export type EventCategory = {
-  id: number;
-  name: string;
-  nuxtlink: string;
-};
-
-export type RelatedItem = {
-  id: number;
-  title: string;
-  thumbnail?: string;
   nuxtlink?: string;
-  link?: string;
-  author_detail?: {
-    id?: number;
-    name?: string;
-    nuxtlink?: string;
-  };
-  primary_category?: Array<{
-    nicename?: string;
-    name?: string;
-    nuxtlink?: string;
-  }>;
-  category?: EventCategory[];
-};
-
-export type EventHomePost = {
-  id: number;
-  related?: RelatedItem[];
+  nicename?: string;
 };
 
 export type EventCard = {
   id: number;
+  title: string;
   href: string;
   image: string;
-  place: string;
-  placeHref: string;
-  title: string;
-  subject: string;
-  subjectHref: string;
-  category: EventCategory[];
+  subject?: string;
+  subjectHref?: string;
+  category?: EventCardCategory[];
 };
 
-function normalize(s: string) {
-  return (s || "").trim().toLowerCase();
+export type EventTag = {
+  id: number;
+  name?: string;
+  slug?: string;
+};
+
+export type EventRelatedPost = {
+  id: number;
+  date?: string;
+  title: string;
+  thumbnail?: string;
+  link?: string;
+  nuxtlink?: string;
+
+  excerpt?: {
+    rendered?: string;
+  };
+
+  primary_category?: EventCardCategory[];
+  category?: EventCardCategory[];
+
+  featured_image?: {
+    sizes?: {
+      thumbnail?: {
+        src?: string;
+      };
+      medium?: {
+        src?: string;
+      };
+      medium_large?: {
+        src?: string;
+      };
+      large?: {
+        src?: string;
+      };
+      full?: {
+        src?: string;
+      };
+    };
+  };
+};
+
+export type EventHomePost = {
+  id: number;
+
+  title?: {
+    rendered?: string;
+  };
+
+  related?: EventRelatedPost[];
+};
+
+function cleanTitle(title: string) {
+  return title
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#8211;/g, "–")
+    .replace(/&#8216;/g, "‘")
+    .replace(/&#8217;/g, "’")
+    .replace(/&#8220;/g, "“")
+    .replace(/&#8221;/g, "”")
+    .replace(/&amp;/g, "&")
+    .trim();
 }
 
-export function findEventTagId(tags: EventTag[]): number | null {
-  const t =
-    tags.find((x) => normalize(x.slug || "") === "event") ||
-    tags.find((x) => normalize(x.name || "") === "event");
-
-  return t?.id ?? null;
+function pickRelatedImage(item: EventRelatedPost) {
+  return (
+    item.thumbnail ||
+    item.featured_image?.sizes?.large?.src ||
+    item.featured_image?.sizes?.medium_large?.src ||
+    item.featured_image?.sizes?.full?.src ||
+    item.featured_image?.sizes?.medium?.src ||
+    item.featured_image?.sizes?.thumbnail?.src ||
+    ""
+  );
 }
 
-function pickHref(r: RelatedItem) {
-  return r.nuxtlink || r.link || "/";
+function pickRelatedHref(item: EventRelatedPost) {
+  return item.nuxtlink || item.link || "#";
 }
 
-function pickPlace(r: RelatedItem) {
-  return r.primary_category?.[0]?.nicename || r.primary_category?.[0]?.name || "";
-}
-
-function pickPlaceHref(r: RelatedItem) {
-  return r.primary_category?.[0]?.nuxtlink || "#";
-}
-
-function pickSubject(r: RelatedItem) {
-  return r.author_detail?.name || "";
-}
-
-function pickSubjectHref(r: RelatedItem) {
-  const authorId = r.author_detail?.id;
-  const authorNuxtlink = r.author_detail?.nuxtlink || "";
-  const authorSlug = authorNuxtlink.split("/").filter(Boolean).pop();
-
-  if (authorId && authorSlug) {
-    return `/author/${authorSlug}?id=${authorId}`;
-  }
-
-  return "#";
-}
-
-function pickCategory(r: RelatedItem): EventCategory[] {
-  return Array.isArray(r.category)
-    ? r.category.map((c) => ({
-        id: c.id,
-        name: c.name,
-        nuxtlink: c.nuxtlink,
-      }))
-    : [];
+function pickRelatedCategory(item: EventRelatedPost) {
+  return item.category || item.primary_category || [];
 }
 
 export function mapRelatedToEventCards(
-  posts: EventHomePost[],
-  limit = 3
+  items: EventRelatedPost[],
+  limit = 3,
 ): EventCard[] {
-  const relatedAll: RelatedItem[] = (posts || []).flatMap(
-    (p) => p.related || []
-  );
-
-  const seen = new Set<number>();
-
-  const uniq = relatedAll.filter((r) => {
-    if (!r?.id) return false;
-    if (seen.has(r.id)) return false;
-
-    seen.add(r.id);
-    return true;
-  });
-
-  return uniq
-    .map((r): EventCard => ({
-      id: r.id,
-      href: pickHref(r),
-      image: r.thumbnail || "",
-      place: pickPlace(r),
-      placeHref: pickPlaceHref(r),
-      title: r.title || "",
-      subject: pickSubject(r),
-      subjectHref: pickSubjectHref(r),
-      category: pickCategory(r),
-    }))
-    .filter((x) => !!x.image && !!x.href && !!x.title)
-    .slice(0, limit);
+  return items.slice(0, limit).map((item) => ({
+    id: item.id,
+    title: cleanTitle(item.title || ""),
+    href: pickRelatedHref(item),
+    image: pickRelatedImage(item),
+    category: pickRelatedCategory(item),
+  }));
 }
