@@ -1,13 +1,26 @@
 services:
-  web-ady-prod:
+  web-aday-prod:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_ADAY_API_URL: ${NEXT_PUBLIC_ADAY_API_URL}
+        NEXT_PUBLIC_ADAY_API_URL_V1: ${NEXT_PUBLIC_ADAY_API_URL_V1}
+        NEXT_PUBLIC_ADAY_API_URL_V2: ${NEXT_PUBLIC_ADAY_API_URL_V2}
+        NEXT_PUBLIC_ADAY_JSREPORT_URL: ${NEXT_PUBLIC_ADAY_JSREPORT_URL}
+        NEXT_PUBLIC_ADAY_AUTH_API_URL: ${NEXT_PUBLIC_ADAY_AUTH_API_URL}
     container_name: aday-web-prod
+    env_file:
+      - .env
     ports:
-      - "3000:3000"
+      - "3005:3000"
     environment:
       - NODE_ENV=production
+      - NEXT_PUBLIC_ADAY_API_URL=${NEXT_PUBLIC_ADAY_API_URL}
+      - NEXT_PUBLIC_ADAY_API_URL_V1=${NEXT_PUBLIC_ADAY_API_URL_V1}
+      - NEXT_PUBLIC_ADAY_API_URL_V2=${NEXT_PUBLIC_ADAY_API_URL_V2}
+      - NEXT_PUBLIC_ADAY_JSREPORT_URL=${NEXT_PUBLIC_ADAY_JSREPORT_URL}
+      - NEXT_PUBLIC_ADAY_AUTH_API_URL=${NEXT_PUBLIC_ADAY_AUTH_API_URL}
     networks:
       - aday-network
     restart: unless-stopped
