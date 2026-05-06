@@ -25,7 +25,7 @@ function getPostHref(post: AnyPost) {
 
   const slug = post?.slug;
   if (typeof slug === "string" && slug.trim()) {
-    return `/post/${slug}`;
+    return `/${slug}`;
   }
 
   const link = post?.link;

@@ -27,7 +27,7 @@ export default function MagazineHero({ item }: Props) {
         <div className="flex h-full flex-col p-6">
           <div>
             <Link
-              href={'/post/'+item.title}
+              href={'/'+item.title}
               className="text-2xl font-bold leading-tight transition-colors hover:text-[#FE552C] lg:text-4xl"
             >
               {item.title}

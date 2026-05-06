@@ -29,7 +29,7 @@ function toPostPathFromNuxtlink(nuxtlink?: string) {
   const p = String(nuxtlink || "").trim();
   if (!p) return "";
   const slug = p.replace(/^\/+|\/+$/g, "");
-  return slug ? `/post/${slug}` : "";
+  return slug ? `/${slug}` : "";
 }
 
 function pickImage(p: any) {
@@ -123,7 +123,7 @@ export default async function PostPage(props: {
     (Array.isArray(post?.related_posts) && post.related_posts) ||
     (Array.isArray(res) && res.length > 1 ? res : []);
 
-  const related = mapRelated(relatedRaw).filter((x) => x.postHref !== `/post/${slug}`);
+  const related = mapRelated(relatedRaw).filter((x) => x.postHref !== `/${slug}`);
 
   return (
     <main>

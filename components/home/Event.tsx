@@ -18,7 +18,7 @@ function getPostHref(href: string) {
     return `/${cleanHref}`;
   }
 
-  return `/post/${cleanHref}`;
+  return `/${cleanHref}`;
 }
 
 export default function Event({ items }: Props) {

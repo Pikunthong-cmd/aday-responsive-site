@@ -44,7 +44,7 @@ export default function MagazineSection({ title, items }: Props) {
             <div className="mt-3">
               {item.href ? (
                 <Link
-                  href={'/post/'+item.title}
+                  href={'/'+item.title}
                   className="line-clamp-2 text-sm font-bold leading-snug transition-colors hover:text-[#FE552C]"
                 >
                   {item.title}
@@ -57,7 +57,7 @@ export default function MagazineSection({ title, items }: Props) {
 
               {item.href ? (
                 <Link
-                  href={'/post/'+item.title}
+                  href={'/'+item.title}
                   className="mt-1 inline-block text-xs text-black/50 transition-colors hover:text-[#FE552C]"
                 >
                   {item.author}

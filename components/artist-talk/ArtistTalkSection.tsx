@@ -44,7 +44,7 @@ function mapToCardItems(raw: any[], categoryName?: string): CardItem[] {
       const id = it?.id;
       const slug = String(it?.slug || "").trim();
       const title = stripHtml(it?.title?.rendered || "");
-      const link = slug ? `/post/${slug}` : "";
+      const link = slug ? `/${slug}` : "";
       const image = it?.opengraph_image?.url || "";
       const width = Number(it?.opengraph_image?.width);
       const height = Number(it?.opengraph_image?.height);

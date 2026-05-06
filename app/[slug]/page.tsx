@@ -30,7 +30,7 @@ function toPostPathFromNuxtlink(nuxtlink?: string) {
   const p = String(nuxtlink || "").trim();
   if (!p) return "";
   const slug = p.replace(/^\/+|\/+$/g, "");
-  return slug ? `/post/${slug}` : "";
+  return slug ? `/${slug}` : "";
 }
 
 function toAuthorPath(authorSlug?: string, authorId?: number | string) {
@@ -205,7 +205,7 @@ export default async function PostPage(props: {
     (Array.isArray(res) && res.length > 1 ? res : []);
 
   const related = mapRelated(relatedRaw).filter(
-    (x) => x.postHref !== `/post/${slug}`,
+    (x) => x.postHref !== `/${slug}`,
   );
 
   return (
