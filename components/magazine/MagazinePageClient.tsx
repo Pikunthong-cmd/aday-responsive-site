@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import MagazineHero from "@/components/magazine/MagazineHero";
 import MagazineSection from "@/components/magazine/MagazineSection";
+import { aDayMagazineAPI } from "@/src/api/a-day-magazine";
 
 const MagazineBookReader = dynamic(
   () => import("@/components/magazine/MagazineBookReader"),
@@ -14,6 +15,7 @@ type RawPost = any;
 
 type MagazineItem = {
   id: number;
+  slug: string;
   title: string;
   author: string;
   href: string;
@@ -21,6 +23,7 @@ type MagazineItem = {
   coverImage: string;
   spreadImage: string;
   mobileImage: string;
+  gallery: string[];
 };
 
 function pickImage(post: any, type: "vertical" | "featured" | "mobile") {
@@ -51,7 +54,8 @@ function pickImage(post: any, type: "vertical" | "featured" | "mobile") {
 }
 
 export default function MagazinePageClient({ posts }: { posts: RawPost[] }) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedItem, setSelectedItem] = useState<MagazineItem | null>(null);
+  const [loadingSlug, setLoadingSlug] = useState<string | null>(null);
   const readerRef = useRef<HTMLDivElement | null>(null);
 
   const items = useMemo<MagazineItem[]>(() => {
@@ -63,6 +67,7 @@ export default function MagazinePageClient({ posts }: { posts: RawPost[] }) {
 
         return {
           id: post?.id,
+          slug: post?.slug || "",
           title: post?.title?.rendered || "Untitled",
           author: post?.author_detail?.name || "a team",
           href: post?.link || "#",
@@ -70,44 +75,61 @@ export default function MagazinePageClient({ posts }: { posts: RawPost[] }) {
           coverImage,
           spreadImage,
           mobileImage,
+          gallery: Array.isArray(post?.image_gallery) ? post.image_gallery : [],
         };
       })
-      .filter((item) => item.id && item.image);
+      .filter((item) => item.id && item.slug && item.image);
   }, [posts]);
 
   const heroItem = items[0] || null;
 
-  const selectedItem = useMemo(
-    () => items.find((item) => item.id === selectedId) || null,
-    [items, selectedId]
-  );
+  const handleSelect = async (item: MagazineItem) => {
+    try {
+      setLoadingSlug(item.slug);
 
-  const handleSelect = (id: number) => {
-    setSelectedId(id);
+      const detailRes = await aDayMagazineAPI.getCategoriesBySlug(item.slug);
 
-    setTimeout(() => {
-      readerRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
+      const detail = Array.isArray(detailRes) ? detailRes[0] : detailRes;
+
+      const gallery = Array.isArray(detail?.image_gallery)
+        ? detail.image_gallery
+        : [];
+
+      setSelectedItem({
+        ...item,
+        gallery,
+        coverImage: pickImage(detail, "vertical") || item.coverImage,
+        spreadImage: pickImage(detail, "featured") || item.spreadImage,
+        mobileImage: pickImage(detail, "mobile") || item.mobileImage,
       });
-    }, 150);
+
+      setTimeout(() => {
+        readerRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 150);
+    } catch (error) {
+      console.error("Failed to load magazine detail:", error);
+    } finally {
+      setLoadingSlug(null);
+    }
   };
 
-  const recommendItems = items.map((item) => ({
+  const sectionItems = items.map((item) => ({
     image: item.image,
     title: item.title,
     author: item.author,
     href: item.href,
-    onClick: () => handleSelect(item.id),
+    onClick: () => handleSelect(item),
   }));
 
-  const latestItems = items.map((item) => ({
-    image: item.image,
-    title: item.title,
-    author: item.author,
-    href: item.href,
-    onClick: () => handleSelect(item.id),
-  }));
+  const pages = selectedItem
+    ? [
+        selectedItem.coverImage || selectedItem.image,
+        ...selectedItem.gallery,
+      ].filter(Boolean)
+    : [];
 
   return (
     <>
@@ -119,23 +141,20 @@ export default function MagazinePageClient({ posts }: { posts: RawPost[] }) {
             title={selectedItem.title}
             author={selectedItem.author}
             coverImage={selectedItem.coverImage || selectedItem.image}
-            pages={[
-              selectedItem.coverImage || selectedItem.image,
-              selectedItem.mobileImage ||
-                selectedItem.spreadImage ||
-                selectedItem.image,
-              selectedItem.spreadImage ||
-                selectedItem.mobileImage ||
-                selectedItem.image,
-              selectedItem.coverImage || selectedItem.image,
-            ].filter(Boolean)}
+            pages={pages}
           />
         </div>
       ) : null}
 
-      <MagazineSection title="แนะนำ" items={recommendItems} />
+      {loadingSlug ? (
+        <div className="px-6 py-6 text-center text-sm text-black/50">
+          Loading magazine...
+        </div>
+      ) : null}
 
-      <MagazineSection title="LATEST" items={latestItems} />
+      <MagazineSection title="แนะนำ" items={sectionItems} />
+
+      <MagazineSection title="LATEST" items={sectionItems} />
     </>
   );
 }

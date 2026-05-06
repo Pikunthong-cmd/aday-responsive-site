@@ -5,28 +5,40 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { IconMenu, IconSearch } from "../Icon";
+import { IconSearch } from "../Icon";
 import FullScreenMenu from "../FullScreenMenu";
 import { themeFromPathname } from "../constants/headerThemeRouteMap";
 import { HEADER_THEME_CLASS } from "../constants/headerTheme";
 import SearchOverlay from "./SearchOverlay";
+import GTranslateSwitcher from "./GTranslateSwitcher";
+import HeaderMenuRive from "../HeaderLogoRive";
 
 export default function Header() {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
   const pathname = usePathname();
   const theme = themeFromPathname(pathname);
+
+  const bgClass = HEADER_THEME_CLASS[theme];
+
+  const darkThemes = ["bg-black", "bg-[#252872]", "bg-[#5F1B13]"];
+
+  const isDarkBg = darkThemes.includes(bgClass);
+
+  const iconColorClass = isDarkBg ? "text-white" : "text-[#FE552C]";
 
   return (
     <header
       className={`
         relative h-[70px] w-full
         transition-colors duration-300
-        ${HEADER_THEME_CLASS[theme]}
+        ${bgClass}
       `}
     >
       <div className="h-full px-4 md:px-6 lg:px-8 2xl:px-10">
         <div className="flex h-full items-center justify-between">
+          {/* LOGO */}
           <div
             className="
               relative z-10 flex h-full items-center
@@ -42,24 +54,25 @@ export default function Header() {
             </Link>
           </div>
 
+          {/* ACTIONS */}
           <div className="flex items-center gap-4">
+            <GTranslateSwitcher />
+
             <button
               type="button"
-              className="cursor-pointer"
               aria-label="Search"
               onClick={() => setSearchOpen(true)}
+              className={`cursor-pointer ${iconColorClass}`}
             >
               <IconSearch width={28} height={28} />
             </button>
 
-            <button
-              type="button"
-              className="cursor-pointer"
+            {/* MENU */}
+            <HeaderMenuRive
+              key={bgClass === "bg-black" ? "default-rive" : "white-rive"}
               onClick={() => setOpen(true)}
-              aria-label="Open menu"
-            >
-              <IconMenu width={28} height={28} />
-            </button>
+              variant={bgClass === "bg-black" ? "default" : "white"}
+            />
 
             <FullScreenMenu open={open} onClose={() => setOpen(false)} />
           </div>

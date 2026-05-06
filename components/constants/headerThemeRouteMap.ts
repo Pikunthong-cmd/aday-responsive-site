@@ -33,7 +33,7 @@ const SLUG_THEME = defineSlugTheme({
   "เจอนั่นที่ย่านนี้-journey-ที่ย": "เจอนั่นที่ย่านนี้-journey-ที่ย",
   "บันทึกการอ่าน": "บันทึกการอ่าน",
   "ของที่รฤก": "ของที่รฤก",
-  "ตามไปดู": "ตามไปดู",
+  "go-and-see": "ตามไปดู",
 } as const);
 
 function safeDecode(s: string) {

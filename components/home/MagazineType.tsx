@@ -10,12 +10,12 @@ type Item = {
 const items: Item[] = [
   {
     title: "main course",
-    image: "/images/magazine-type-01.png",
+    image: "/images/magazine-type-01.jpg",
     href: "/category/maincourse",
   },
   {
     title: "wake up",
-    image: "/images/magazine-type-02.png",
+    image: "/images/magazine-type-02.jpg",
     href: "/category/wake-up",
   },
 ];

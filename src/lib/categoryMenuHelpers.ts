@@ -14,7 +14,7 @@ export type MenuResponse = {
 };
 
 export type CategoryCard = {
-  category: "shop" | "podcast" | "nostalgia";
+  category: "shop" | "podcast" | "series";
   title: string;
   image: string;
   href: string;
@@ -65,16 +65,16 @@ export function buildCategoryCardsFromMenu(menu: MenuResponse | null): CategoryC
       image: "/images/category-podcast.png",
       href: "/podcast",
     },
-    nostalgia: {
-      category: "nostalgia",
-      title: "Nostalgia",
+    series: {
+      category: "series",
+      title: "Series",
       image: "/images/category-series.png",
-      href: "/category/nostalgia",
+      href: "/category/series",
     },
   };
 
   if (!menu?.items?.length) {
-    return [fallbacks.shop, fallbacks.podcast, fallbacks.nostalgia];
+    return [fallbacks.shop, fallbacks.podcast, fallbacks.series];
   }
 
   const flat = flattenMenu(menu.items);
@@ -86,7 +86,7 @@ export function buildCategoryCardsFromMenu(menu: MenuResponse | null): CategoryC
   }> = [
     { key: "shop", matchTitles: ["shop"] },
     { key: "podcast", matchTitles: ["podcast"] },
-    { key: "nostalgia", matchTitles: ["nostalgia"] },
+    { key: "series", matchTitles: ["series"] },
   ];
 
   return targets.map(({ key, matchTitles }) => {

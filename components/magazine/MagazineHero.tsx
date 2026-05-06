@@ -27,7 +27,7 @@ export default function MagazineHero({ item }: Props) {
         <div className="flex h-full flex-col p-6">
           <div>
             <Link
-              href={item.href}
+              href={'/post/'+item.title}
               className="text-2xl font-bold leading-tight transition-colors hover:text-[#FE552C] lg:text-4xl"
             >
               {item.title}
@@ -39,12 +39,15 @@ export default function MagazineHero({ item }: Props) {
               นักเขียน : {item.author}
             </p>
 
-            <Link
+            {/* <Link
               href={item.href}
               className="ml-auto bg-[#FE552C] px-6 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
             >
               MAGAZINE
-            </Link>
+            </Link> */}
+            <div className="ml-auto bg-[#FE552C] px-6 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90">
+              MAGAZINE
+            </div>
           </div>
         </div>
       </div>

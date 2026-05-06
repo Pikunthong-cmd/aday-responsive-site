@@ -27,14 +27,16 @@ export default function MagazineSection({ title, items }: Props) {
             <button
               type="button"
               onClick={item.onClick}
-              className="block w-full text-left"
+              className="block w-full text-left cursor-pointer"
             >
-              <div className="relative aspect-[3/4] overflow-hidden bg-[#eee]">
+              <div className="bg-[#eee] flex items-center justify-center">
                 <Image
                   src={item.image}
                   alt={item.title}
-                  fill
-                  className="object-cover transition duration-300 group-hover:scale-[1.02]"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="h-auto w-auto max-h-[400px] object-contain transition"
                 />
               </div>
             </button>
@@ -42,7 +44,7 @@ export default function MagazineSection({ title, items }: Props) {
             <div className="mt-3">
               {item.href ? (
                 <Link
-                  href={item.href}
+                  href={'/post/'+item.title}
                   className="line-clamp-2 text-sm font-bold leading-snug transition-colors hover:text-[#FE552C]"
                 >
                   {item.title}
@@ -55,7 +57,7 @@ export default function MagazineSection({ title, items }: Props) {
 
               {item.href ? (
                 <Link
-                  href={item.href}
+                  href={'/post/'+item.title}
                   className="mt-1 inline-block text-xs text-black/50 transition-colors hover:text-[#FE552C]"
                 >
                   {item.author}

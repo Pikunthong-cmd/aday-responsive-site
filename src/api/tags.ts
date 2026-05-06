@@ -8,7 +8,7 @@ export const tagsAPI = {
   },
 
   getEvent: async () => {
-    const res = await adayApiClientV2.get("/tags?slug=EVENT");
+    const res = await adayApiClientV2.get("/categories?slug=activities");
     return res.data;
   },
 

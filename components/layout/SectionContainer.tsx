@@ -16,7 +16,7 @@ export default function SectionContainer({
   return (
     <section
       className={cn(
-        fullWidth ? "w-full max-w-none" : "max-w-7xl mx-auto px-4 sm:px-6 ",
+        fullWidth ? "w-full max-w-none" : "max-w-10xl mx-auto px-4 sm:px-6 ",
         padded && !fullWidth && "px-4 sm:px-6 ",
         className
       )}

@@ -10,8 +10,8 @@ import MagazineType from "@/components/home/MagazineType";
 
 import { menuAPI } from "@/src/api/menu";
 import { homeAPI } from "@/src/api/home";
-import { postsAPI } from "@/src/api/posts";
 import { tagsAPI } from "@/src/api/tags";
+import { postsAPI } from "@/src/api/posts";
 
 import {
   MenuResponse,
@@ -21,12 +21,6 @@ import {
   pickHref,
 } from "@/src/lib/menuHelpers";
 
-import {
-  mapRelatedToCards,
-  VideoHomeApiPost,
-  VideoHomeCard,
-} from "@/src/lib/postsVideoHomeHelpers";
-
 import { buildCategoryCardsFromMenu } from "@/src/lib/categoryMenuHelpers";
 import HeroSkeleton from "@/components/home/skeletons/HeroSkeleton";
 
@@ -34,9 +28,9 @@ import {
   EventCard,
   EventHomePost,
   EventTag,
-  findEventTagId,
   mapRelatedToEventCards,
 } from "@/src/lib/eventHomeHelpers";
+
 import WatchCursor from "@/components/ui/WatchCursor";
 
 type BannerVideoResponse = {
@@ -45,10 +39,17 @@ type BannerVideoResponse = {
   linkUrl: string;
 };
 
+type BannerVideoCard = {
+  id: number;
+  title: string;
+  href: string;
+  video: string;
+};
+
 export default function Home() {
   const [menu, setMenu] = useState<MenuResponse | null>(null);
   const [banner, setBanner] = useState<BannerVideoResponse | null>(null);
-  const [videoCards, setVideoCards] = useState<VideoHomeCard[]>([]);
+  const [videoCards, setVideoCards] = useState<BannerVideoCard[]>([]);
   const [eventItems, setEventItems] = useState<EventCard[]>([]);
 
   const [loadingMenu, setLoadingMenu] = useState(true);
@@ -57,18 +58,25 @@ export default function Home() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+
+    async function loadMenu() {
       try {
         setLoadingMenu(true);
+
         const resMenu = (await menuAPI.getAll()) as MenuResponse;
+
         if (!mounted) return;
+
         setMenu(resMenu);
-      } catch (e) {
-        console.error("Failed to load menu", e);
+      } catch (error) {
+        console.error("Failed to load menu", error);
       } finally {
         if (mounted) setLoadingMenu(false);
       }
-    })();
+    }
+
+    loadMenu();
+
     return () => {
       mounted = false;
     };
@@ -76,29 +84,39 @@ export default function Home() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+
+    async function loadHomeSections() {
       try {
         setLoadingHomeSections(true);
-        const [bannerRes, postsRes] = await Promise.all([
-          homeAPI.getAllBanerVideo() as Promise<BannerVideoResponse[]>,
-          postsAPI.getVideoHome() as Promise<VideoHomeApiPost[]>,
-        ]);
+
+        const bannerRes =
+          (await homeAPI.getAllBanerVideo()) as BannerVideoResponse[];
 
         if (!mounted) return;
 
-        const mainBanner = bannerRes.find((item) => item.key === "main");
+        const mainBanner =
+          bannerRes.find((item) => item.key === "main") ?? null;
 
-        if (mainBanner) {
-          setBanner(mainBanner);
-        }
+        const secondBannerVideos: BannerVideoCard[] = bannerRes
+          .filter((item) => item.key === "second")
+          .map((item, index) => ({
+            id: index + 1,
+            title: `video ${index + 1}`,
+            href: item.linkUrl,
+            video: item.bannerVideo,
+          }));
 
-        setVideoCards(mapRelatedToCards(postsRes, 3));
-      } catch (e) {
-        console.error("Failed to load home sections", e);
+        setBanner(mainBanner);
+        setVideoCards(secondBannerVideos);
+      } catch (error) {
+        console.error("Failed to load home sections", error);
       } finally {
         if (mounted) setLoadingHomeSections(false);
       }
-    })();
+    }
+
+    loadHomeSections();
+
     return () => {
       mounted = false;
     };
@@ -106,22 +124,37 @@ export default function Home() {
 
   useEffect(() => {
     let mounted = true;
-    (async () => {
+
+    async function loadEvents() {
       try {
         setLoadingEvents(true);
+
         const tags = (await tagsAPI.getEvent()) as EventTag[];
-        const tagId = findEventTagId(tags);
-        if (!tagId) return;
+        const tagId = tags[0]?.id;
+
+        if (!tagId) {
+          if (mounted) setEventItems([]);
+          return;
+        }
 
         const posts = (await postsAPI.getEventHome(tagId)) as EventHomePost[];
+
         if (!mounted) return;
-        setEventItems(mapRelatedToEventCards(posts, 3));
-      } catch (e) {
-        console.error("Failed to load event section", e);
+
+        const relatedItems = posts.flatMap((post) => post.related ?? []);
+
+        setEventItems(mapRelatedToEventCards(relatedItems, 3));
+      } catch (error) {
+        console.error("Failed to load event section", error);
+
+        if (mounted) setEventItems([]);
       } finally {
         if (mounted) setLoadingEvents(false);
       }
-    })();
+    }
+
+    loadEvents();
+
     return () => {
       mounted = false;
     };
@@ -134,17 +167,22 @@ export default function Home() {
     const flat = flattenMenu(tree);
 
     const importantItems = flat
-      .filter((i) => i.important === true)
-      .filter((i) => typeof i.banner_image === "string" && i.banner_image);
+      .filter((item) => item.important === true)
+      .filter(
+        (item) =>
+          typeof item.banner_image === "string" && item.banner_image.length > 0,
+      );
 
-    const mapped: (HeroSlide & { order?: number })[] = importantItems.map((item) => ({
-      image: item.banner_image as string,
-      category: findRootCategoryTitle(item, tree) || "Featured",
-      title: item.title || "",
-      description: item.description || "",
-      link: pickHref(item) || "",
-      order: item.order,
-    }));
+    const mapped: (HeroSlide & { order?: number })[] = importantItems.map(
+      (item) => ({
+        image: item.banner_image as string,
+        category: findRootCategoryTitle(item, tree) || "Featured",
+        title: item.title || "",
+        description: item.description || "",
+        link: pickHref(item) || "",
+        order: item.order,
+      }),
+    );
 
     return sortByOrder(mapped).slice(0, 10);
   }, [menu]);
@@ -171,6 +209,7 @@ export default function Home() {
 
       <MagazineType />
       <WatchCursor />
+
       <Experimental
         bannerVideo={banner?.bannerVideo}
         linkUrl={banner?.linkUrl}
@@ -178,7 +217,8 @@ export default function Home() {
       />
 
       <Category items={buildCategoryCardsFromMenu(menu)} />
-      <Event items={eventItems} />
+
+      {!loadingEvents && <Event items={eventItems} />}
     </div>
   );
 }

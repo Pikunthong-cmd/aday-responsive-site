@@ -18,6 +18,40 @@ type HeroProps = {
   initialIndex?: number;
 };
 
+function normalizeCategoryKey(value?: string) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+const CATEGORY_COLOR_MAP: Record<string, string> = {
+  qandaday: "#ead50d",
+  "people power": "#ead50d",
+  founder: "#ead50d",
+  relationships: "#ead50d",
+
+  "artist talk": "#ff4500",
+  "draft till done": "#ff4500",
+  portfolio: "#ff4500",
+
+  "a better day": "#9ac2ff",
+  "see saw scene": "#9ac2ff",
+  ที่ชอบ: "#9ac2ff",
+  ตามไปดู: "#9ac2ff",
+  "witch a boo": "#9ac2ff",
+  บันทึกการอ่าน: "#9ac2ff",
+  "photo stories": "#9ac2ff",
+  heartsell: "#9ac2ff",
+
+  "live in a day": "#9bd941",
+  "a doc": "#9bd941",
+  "day for night": "#9bd941",
+  agenda: "#9bd941",
+};
+
 export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
   const safeSlides = useMemo(() => slides ?? [], [slides]);
 
@@ -56,7 +90,6 @@ export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
     const containerRect = container.getBoundingClientRect();
     const thumbRect = activeThumb.getBoundingClientRect();
 
-    const currentScroll = container.scrollLeft;
     const thumbLeft = activeThumb.offsetLeft;
     const thumbWidth = activeThumb.offsetWidth;
     const containerWidth = container.clientWidth;
@@ -84,9 +117,12 @@ export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
   const activeLink =
     typeof active.link === "string" && active.link.trim() ? active.link : "";
 
+  const themeColor =
+    CATEGORY_COLOR_MAP[normalizeCategoryKey(active.title)] || "#097B55";
+
   return (
     <section className="w-full">
-      <div className="relative w-full overflow-hidden aspect-[16/9]">
+      <div className="relative aspect-[16/9] w-full overflow-hidden">
         {safeSlides.map((item, index) => {
           const isActive = index === activeIndex;
 
@@ -94,47 +130,77 @@ export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
             <div
               key={`${item.image}-${index}`}
               className={`absolute inset-0 transition-opacity duration-[1400ms] ease-in-out ${
-                isActive ? "opacity-100" : "opacity-0"
+                isActive ? "z-[1] opacity-100" : "z-0 opacity-0"
               }`}
             >
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                priority={index === activeIndex}
-                className="object-cover"
-              />
+              {isActive && item.link ? (
+                <Link
+                  href={item.link}
+                  className="absolute inset-0 z-[2] block cursor-pointer"
+                  aria-label={item.title}
+                >
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    fill
+                    priority={index === activeIndex}
+                    className="object-cover"
+                  />
+                </Link>
+              ) : (
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  priority={index === activeIndex}
+                  className="object-cover"
+                />
+              )}
             </div>
           );
         })}
 
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 z-[3] bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
 
-        <div className="absolute bottom-0 left-0 z-10 w-full">
+        <div className="pointer-events-none absolute bottom-0 left-0 z-[4] w-full">
           <div className="max-w-2xl px-6 py-8 md:px-12 md:py-12">
             <div className="mb-2 text-[12px] font-bold uppercase tracking-[0.12em] text-[#FE552C] md:text-sm">
               {active.category}
             </div>
 
-            {active.description ? (
-              <h1 className="mb-2 text-[24px] font-bold leading-[1.15] text-white md:text-[38px]">
-                {active.description}
-              </h1>
-            ) : (
-              <h1 className="mb-2 text-[24px] font-bold leading-[1.15] text-white md:text-[38px]">
-                -
-              </h1>
-            )}
+            <h1 className="mb-2 text-[24px] font-bold leading-[1.15] text-white md:text-[38px]">
+              {active.description || "-"}
+            </h1>
 
             {activeLink ? (
               <Link
                 href={activeLink}
-                className="inline-flex cursor-pointer items-center rounded-full border border-[#097B55] bg-[#097B55]/15 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-[#097B55] transition-colors duration-300 hover:bg-[#097B55] hover:text-white md:px-5 md:py-2"
+                className="pointer-events-auto inline-flex cursor-pointer items-center rounded-full border px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] transition-colors duration-300 md:px-5 md:py-2"
+                style={{
+                  borderColor: themeColor,
+                  backgroundColor: `${themeColor}26`,
+                  color: themeColor,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = themeColor;
+                  e.currentTarget.style.color = "#fff";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = `${themeColor}26`;
+                  e.currentTarget.style.color = themeColor;
+                }}
               >
                 {active.title}
               </Link>
             ) : (
-              <div className="inline-flex items-center rounded-full border border-[#097B55] bg-[#097B55]/15 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-[#097B55] md:px-5 md:py-2">
+              <div
+                className="inline-flex items-center rounded-full border px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] md:px-5 md:py-2"
+                style={{
+                  borderColor: themeColor,
+                  backgroundColor: `${themeColor}26`,
+                  color: themeColor,
+                }}
+              >
                 {active.title}
               </div>
             )}
@@ -146,7 +212,7 @@ export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
         <div className="w-full px-0">
           <div
             ref={thumbsContainerRef}
-            className="no-scrollbar mb-5 flex w-full snap-x snap-mandatory gap-0 overflow-x-auto scroll-smooth"
+            className="no-scrollbar mb-5 flex w-full snap-x snap-mandatory gap-0 overflow-x-auto scroll-smooth pr-2.5"
           >
             {safeSlides.map((item, index) => {
               const isActive = index === activeIndex;
@@ -161,51 +227,56 @@ export default function Hero({ slides, initialIndex = 0 }: HeroProps) {
                   onClick={() => handleSelectSlide(index)}
                   className="group relative block w-[85%] shrink-0 cursor-pointer snap-start overflow-hidden p-0 text-left sm:w-[60%] md:w-[45%] lg:w-1/3"
                 >
-                  <div className="relative aspect-[16/7] w-full">
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 85vw, (max-width: 768px) 60vw, (max-width: 1024px) 45vw, 33vw"
-                    />
+                  <Link
+                    href={item.link || "#"}
+                    onClick={() => handleSelectSlide(index)}
+                  >
+                    <div className="relative mx-2.5 mt-5 aspect-[16/7] w-full">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 85vw, (max-width: 768px) 60vw, (max-width: 1024px) 45vw, 33vw"
+                      />
 
-                    <div
-                      className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-                        isActive
-                          ? "bg-black/45 opacity-100"
-                          : "bg-black/0 opacity-0 group-hover:bg-black/20 group-hover:opacity-100"
-                      }`}
-                    />
-
-                    <div className="absolute inset-0 flex items-center justify-center p-4 text-center md:p-6">
                       <div
-                        className={`w-full transition-all duration-700 ease-in-out ${
+                        className={`absolute inset-0 transition-all duration-700 ease-in-out ${
                           isActive
-                            ? "opacity-100 scale-100"
-                            : "opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100"
+                            ? "bg-black/45 opacity-100"
+                            : "bg-black/0 opacity-0 group-hover:bg-black/20 group-hover:opacity-100"
                         }`}
-                      >
-                        <div className="mx-auto flex min-h-full w-full items-center justify-center">
-                          <div>
-                            <div className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#FE552C] md:text-[14px]">
-                              {item.category}
-                            </div>
+                      />
 
-                            <div className="mt-2 text-[16px] font-semibold uppercase leading-[1.2] tracking-[0.06em] text-white md:text-[22px]">
-                              {item.tag || item.title}
+                      <div className="absolute inset-0 flex items-center justify-center p-4 text-center md:p-6">
+                        <div
+                          className={`w-full transition-all duration-700 ease-in-out ${
+                            isActive
+                              ? "scale-100 opacity-100"
+                              : "scale-95 opacity-0 group-hover:scale-100 group-hover:opacity-100"
+                          }`}
+                        >
+                          <div className="mx-auto flex min-h-full w-full items-center justify-center">
+                            <div>
+                              <div className="text-[12px] font-bold uppercase tracking-[0.12em] text-[#FE552C] md:text-[14px]">
+                                {item.category}
+                              </div>
+
+                              <div className="mt-2 text-[16px] font-semibold uppercase leading-[1.2] tracking-[0.06em] text-white md:text-[22px]">
+                                {item.tag || item.title}
+                              </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    {isActive ? (
-                      <div className="pointer-events-none absolute inset-0 ring-2 ring-black/70" />
-                    ) : (
-                      <div className="pointer-events-none absolute inset-0 ring-1 ring-black/10 transition-colors duration-500 group-hover:ring-black/20" />
-                    )}
-                  </div>
+                      {isActive ? (
+                        <div className="pointer-events-none absolute inset-0 ring-2 ring-black/70" />
+                      ) : (
+                        <div className="pointer-events-none absolute inset-0 ring-1 ring-black/10 transition-colors duration-500 group-hover:ring-black/20" />
+                      )}
+                    </div>
+                  </Link>
                 </button>
               );
             })}
