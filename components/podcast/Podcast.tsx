@@ -2,17 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import AuthorLink from "../ui/AuthorLink";
 
-
-type AnyPost = any;
+type AnyItem = any;
 
 type RenderedField = { rendered?: unknown } | string | null | undefined;
 
 function toText(input: RenderedField): string {
   if (typeof input === "string") return input;
+
   if (input && typeof input === "object" && "rendered" in input) {
     const r = (input as any).rendered;
     return typeof r === "string" ? r : "";
   }
+
   return "";
 }
 
@@ -22,43 +23,75 @@ function stripHtml(input: RenderedField): string {
   return html.replace(/<[^>]*>/g, "").trim();
 }
 
-function getPostHref(post: AnyPost) {
-  const nuxtlink = post?.nuxtlink;
+function getTitle(item: AnyItem) {
+  // post format: title.rendered
+  const postTitle = stripHtml(item?.title);
+  if (postTitle) return postTitle;
+
+  // category format: name
+  if (typeof item?.name === "string" && item.name.length > 0) {
+    return item.name;
+  }
+
+  return "Untitled";
+}
+
+function getItemHref(item: AnyItem) {
+  const nuxtlink = item?.nuxtlink;
   if (typeof nuxtlink === "string" && nuxtlink.length > 0) return nuxtlink;
 
-  const link = post?.link;
+  const link = item?.link;
   if (typeof link === "string" && link.length > 0) return link;
 
-  const slug = post?.slug;
-  if (typeof slug === "string" && slug.length > 0) return `/posts/${slug}`;
+  const slug = item?.slug;
+  if (typeof slug === "string" && slug.length > 0) {
+    // ถ้าเป็น category จาก podcast
+    if (item?.term_id) return `/category/podcast/${slug}/`;
+
+    // ถ้าเป็น post
+    return `/posts/${slug}`;
+  }
 
   return "#";
 }
 
-function getCover(post: AnyPost, index: number) {
+function getCover(item: AnyItem, index: number) {
   const fallback =
     index % 3 === 0
       ? "/podcast.svg"
       : index % 3 === 1
-      ? "/podcast-1.svg"
-      : "/podcast-2.svg";
+        ? "/podcast-1.svg"
+        : "/podcast-2.svg";
 
   const fromApi =
-    post?.featured_image?.sizes?.full?.src ||
-    post?.featured_image?.sizes?.large?.src ||
-    post?.featured_image?.sizes?.medium_large?.src ||
-    post?.featured_image?.sizes?.medium?.src ||
-    post?.mobile_image?.sizes?.full?.src ||
-    post?.mobile_image?.sizes?.large?.src ||
-    post?.thumbnail;
+    // post image
+    item?.featured_image?.sizes?.full?.src ||
+    item?.featured_image?.sizes?.large?.src ||
+    item?.featured_image?.sizes?.medium_large?.src ||
+    item?.featured_image?.sizes?.medium?.src ||
+    item?.mobile_image?.sizes?.full?.src ||
+    item?.mobile_image?.sizes?.large?.src ||
+    item?.thumbnail ||
+
+    // category image
+    item?.vertical_image?.sizes?.full?.src ||
+    item?.vertical_image?.sizes?.large?.src ||
+    item?.vertical_image?.sizes?.medium_large?.src ||
+    item?.vertical_image?.sizes?.medium?.src ||
+    item?.vertical_image?.sizes?.thumbnail?.src;
 
   return typeof fromApi === "string" && fromApi.length > 0 ? fromApi : fallback;
 }
 
-function PostCard({ post, index }: { post: AnyPost; index: number }) {
-  const title = stripHtml(post?.title) || "Untitled";
-  const cover = getCover(post, index);
-  const href = getPostHref(post);
+function isCategoryItem(item: AnyItem) {
+  return Boolean(item?.term_id && item?.name);
+}
+
+function PodcastCard({ item, index }: { item: AnyItem; index: number }) {
+  const title = getTitle(item);
+  const cover = getCover(item, index);
+  const href = getItemHref(item);
+  const isCategory = isCategoryItem(item);
 
   return (
     <article className="group overflow-hidden shadow-sm transition hover:shadow-md">
@@ -82,13 +115,15 @@ function PostCard({ post, index }: { post: AnyPost; index: number }) {
             {title}
           </h3>
 
-          <AuthorLink
-            post={post}
-            label="Host :"
-            className="pointer-events-auto mt-1 line-clamp-1 text-sm md:text-base"
-            textClassName="text-[#FE552C]"
-            linkClassName="relative z-[4] text-[#FE552C] transition-colors duration-300 hover:text-white"
-          />
+          {!isCategory && (
+            <AuthorLink
+              post={item}
+              label="Host :"
+              className="pointer-events-auto mt-1 line-clamp-1 text-sm md:text-base"
+              textClassName="text-[#FE552C]"
+              linkClassName="relative z-[4] text-[#FE552C] transition-colors duration-300 hover:text-white"
+            />
+          )}
         </div>
       </div>
     </article>
@@ -100,12 +135,14 @@ export default function PodcastSection({
   title = "Podcast",
   limit,
 }: {
-  posts: AnyPost[];
+  posts: AnyItem[];
   title?: string;
   limit?: number;
 }) {
   const safePosts = Array.isArray(posts) ? posts : [];
-  const displayPosts = typeof limit === "number" ? safePosts.slice(0, limit) : safePosts;
+
+  const displayPosts =
+    typeof limit === "number" ? safePosts.slice(0, limit) : safePosts;
 
   return (
     <section className="w-full py-10">
@@ -119,8 +156,12 @@ export default function PodcastSection({
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 lg:grid-cols-3">
-          {displayPosts.map((p, idx) => (
-            <PostCard key={p?.id ?? `${idx}`} post={p} index={idx} />
+          {displayPosts.map((item, idx) => (
+            <PodcastCard
+              key={item?.id ?? item?.term_id ?? `${idx}`}
+              item={item}
+              index={idx}
+            />
           ))}
         </div>
       )}

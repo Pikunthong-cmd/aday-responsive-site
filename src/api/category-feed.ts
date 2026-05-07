@@ -21,12 +21,12 @@ export const categoryFeedAPI = {
   ) => {
     if (!categoryId) {
       return [];
+      
     }
-
     const res = await adayApiClientV2.get(
       `/posts?page=1&per_page=${perPage}&categories=${categoryId}&offset=${offset}`
     );
-
+    
     return Array.isArray(res.data) ? res.data : [];
   },
 

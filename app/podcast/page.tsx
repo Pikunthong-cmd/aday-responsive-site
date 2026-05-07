@@ -3,11 +3,14 @@ import SectionContainer from "@/components/layout/SectionContainer";
 import PodcastSection from "@/components/podcast/Podcast";
 import { categoryFeedAPI } from "@/src/api/category-feed";
 
-const PAGE_SIZE = 8;
-
 function formatCategoryTitle(name: string) {
   const hasThai = /[\u0E00-\u0E7F]/.test(name);
   return hasThai ? name : name.toUpperCase();
+}
+
+function toArray<T>(data: T | T[] | null | undefined): T[] {
+  if (Array.isArray(data)) return data;
+  return data ? [data] : [];
 }
 
 export default async function PodcastPage() {
@@ -16,31 +19,37 @@ export default async function PodcastPage() {
   const catRes = await categoryFeedAPI.getCategoryBySlug(decodedSlug);
   const category = Array.isArray(catRes) ? catRes?.[0] : catRes;
 
-  const categoryId: number | null = category?.id ?? null;
-
   const categoryNameRaw: string = category?.name ?? decodedSlug;
-  const categoryName: string = formatCategoryTitle(categoryNameRaw);
+  const categoryName = formatCategoryTitle(categoryNameRaw);
 
-  const heroImg: string =
-    category?.column_image?.sizes?.full?.src ?? "/images/artist-talk/hero.png";
+  const heroImg =
+    category?.column_image?.sizes?.full?.src ??
+    category?.featured_image?.sizes?.full?.src ??
+    "/images/artist-talk/hero.png";
 
-  const initialPosts = categoryId
-    ? await categoryFeedAPI.getPostsByCategoryIdAll(categoryId)
-    : [];
+  const highlightCategories = toArray(category?.highlight_category);
+  const podcastCategories = toArray(category?.sub_category);
 
-  const postsArray = Array.isArray(initialPosts)
-    ? initialPosts
-    : initialPosts
-      ? [initialPosts]
-      : [];
-  const listPosts = postsArray;
+  // ยังไม่ต้องเรียก posts ตอนนี้
+  // const highlightPosts = await Promise.all(
+  //   highlightCategories.map((item: any) =>
+  //     categoryFeedAPI.getPostsByCategoryIdAll(item.term_id)
+  //   )
+  // );
+
+  // const podcastPosts = await Promise.all(
+  //   podcastCategories.map((item: any) =>
+  //     categoryFeedAPI.getPostsByCategoryIdAll(item.term_id)
+  //   )
+  // );
 
   return (
     <div className="bg-[#EFEEE7]">
       <HeroCategory imageSrc={heroImg} title={""} />
+
       <SectionContainer padded>
-        <PodcastSection posts={listPosts} title="Highlight" />
-        <PodcastSection posts={listPosts} title="Podcast" />
+        <PodcastSection posts={highlightCategories} title="Highlight" />
+        <PodcastSection posts={podcastCategories} title="Podcast" />
       </SectionContainer>
     </div>
   );

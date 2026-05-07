@@ -11,7 +11,6 @@ import MagazineType from "@/components/home/MagazineType";
 import { menuAPI } from "@/src/api/menu";
 import { homeAPI } from "@/src/api/home";
 import { tagsAPI } from "@/src/api/tags";
-import { postsAPI } from "@/src/api/posts";
 
 import {
   MenuResponse,
@@ -28,10 +27,11 @@ import {
   EventCard,
   EventHomePost,
   EventTag,
+  findEventTagId,
   mapRelatedToEventCards,
 } from "@/src/lib/eventHomeHelpers";
-
 import WatchCursor from "@/components/ui/WatchCursor";
+import { postsAPI } from "@/src/api/posts";
 
 type BannerVideoResponse = {
   key: string;
@@ -59,23 +59,18 @@ export default function Home() {
   useEffect(() => {
     let mounted = true;
 
-    async function loadMenu() {
+    (async () => {
       try {
         setLoadingMenu(true);
-
         const resMenu = (await menuAPI.getAll()) as MenuResponse;
-
         if (!mounted) return;
-
         setMenu(resMenu);
-      } catch (error) {
-        console.error("Failed to load menu", error);
+      } catch (e) {
+        console.error("Failed to load menu", e);
       } finally {
         if (mounted) setLoadingMenu(false);
       }
-    }
-
-    loadMenu();
+    })();
 
     return () => {
       mounted = false;
@@ -85,12 +80,11 @@ export default function Home() {
   useEffect(() => {
     let mounted = true;
 
-    async function loadHomeSections() {
+    (async () => {
       try {
         setLoadingHomeSections(true);
 
-        const bannerRes =
-          (await homeAPI.getAllBanerVideo()) as BannerVideoResponse[];
+        const bannerRes = (await homeAPI.getAllBanerVideo()) as BannerVideoResponse[];
 
         if (!mounted) return;
 
@@ -108,14 +102,12 @@ export default function Home() {
 
         setBanner(mainBanner);
         setVideoCards(secondBannerVideos);
-      } catch (error) {
-        console.error("Failed to load home sections", error);
+      } catch (e) {
+        console.error("Failed to load home sections", e);
       } finally {
         if (mounted) setLoadingHomeSections(false);
       }
-    }
-
-    loadHomeSections();
+    })();
 
     return () => {
       mounted = false;
@@ -125,35 +117,25 @@ export default function Home() {
   useEffect(() => {
     let mounted = true;
 
-    async function loadEvents() {
+    (async () => {
       try {
         setLoadingEvents(true);
 
         const tags = (await tagsAPI.getEvent()) as EventTag[];
-        const tagId = tags[0]?.id;
+        const tagId = tags[0].id;
 
-        if (!tagId) {
-          if (mounted) setEventItems([]);
-          return;
-        }
+        if (!tagId) return;
 
         const posts = (await postsAPI.getEventHome(tagId)) as EventHomePost[];
-
         if (!mounted) return;
 
-        const relatedItems = posts.flatMap((post) => post.related ?? []);
-
-        setEventItems(mapRelatedToEventCards(relatedItems, 3));
-      } catch (error) {
-        console.error("Failed to load event section", error);
-
-        if (mounted) setEventItems([]);
+        setEventItems(mapRelatedToEventCards(posts, 3));
+      } catch (e) {
+        console.error("Failed to load event section", e);
       } finally {
         if (mounted) setLoadingEvents(false);
       }
-    }
-
-    loadEvents();
+    })();
 
     return () => {
       mounted = false;
@@ -167,11 +149,8 @@ export default function Home() {
     const flat = flattenMenu(tree);
 
     const importantItems = flat
-      .filter((item) => item.important === true)
-      .filter(
-        (item) =>
-          typeof item.banner_image === "string" && item.banner_image.length > 0,
-      );
+      .filter((i) => i.important === true)
+      .filter((i) => typeof i.banner_image === "string" && i.banner_image);
 
     const mapped: (HeroSlide & { order?: number })[] = importantItems.map(
       (item) => ({
@@ -217,8 +196,7 @@ export default function Home() {
       />
 
       <Category items={buildCategoryCardsFromMenu(menu)} />
-
-      {!loadingEvents && <Event items={eventItems} />}
+      <Event items={eventItems} />
     </div>
   );
 }
