@@ -1,6 +1,8 @@
 import MagazinePageClient from "@/components/magazine/MagazinePageClient";
 import { aDayMagazineAPI } from "@/src/api/a-day-magazine";
 
+export const dynamic = "force-dynamic";
+
 export default async function MagazinePage() {
   const categoriesRes = await aDayMagazineAPI.getAll();
 

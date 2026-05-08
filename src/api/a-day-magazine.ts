@@ -11,7 +11,7 @@ export const aDayMagazineAPI = {
     return res.data;
   },
 
-   getAll: async () => {
+  getAll: async () => {
     const res = await adayApiClientV2.get(`/categories?slug=a-day-magazine`);
     return res.data;
   },

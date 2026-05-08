@@ -42,7 +42,7 @@ export default async function AuthorPage({ params, searchParams }: Props) {
       <div className="bg-[#EFEEE7]">
         <div className="mx-auto w-full max-w-6xl px-4 py-10 md:px-6">
           <div className="bg-white p-6 text-sm text-black/70">
-            ไม่พบ author id สำหรับ slug: {slug}
+            ไม่พบ author : {slug}
           </div>
         </div>
       </div>
@@ -53,6 +53,9 @@ export default async function AuthorPage({ params, searchParams }: Props) {
     authorAPI.getById(authorId, 1, 100),
     authorAPI.getUserBySlug(slug),
   ]);
+
+  
+
 
   const postsRaw =
     postsRes?.posts ??
@@ -67,6 +70,9 @@ export default async function AuthorPage({ params, searchParams }: Props) {
   const authorFromPost = getAuthorDetailFromPost(firstPost);
 
   const user = Array.isArray(usersRes) ? usersRes[0] ?? null : usersRes ?? null;
+
+  console.log("postsRaw",postsRaw)
+  console.log("user",user)
 
   const authorName =
     user?.name ||
@@ -101,6 +107,8 @@ export default async function AuthorPage({ params, searchParams }: Props) {
   const safeCurrentPage = Math.min(Math.max(currentPage, 1), totalPages);
   const start = (safeCurrentPage - 1) * POSTS_PER_PAGE;
   const pagedPosts = filteredPosts.slice(start, start + POSTS_PER_PAGE);
+
+  console.log(pagedPosts)
 
   return (
     <div className="bg-[#EFEEE7]">
