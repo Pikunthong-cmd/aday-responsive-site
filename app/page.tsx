@@ -11,6 +11,7 @@ import MagazineType from "@/components/home/MagazineType";
 import { menuAPI } from "@/src/api/menu";
 import { homeAPI } from "@/src/api/home";
 import { tagsAPI } from "@/src/api/tags";
+import { postsAPI } from "@/src/api/posts";
 
 import {
   MenuResponse,
@@ -25,13 +26,12 @@ import HeroSkeleton from "@/components/home/skeletons/HeroSkeleton";
 
 import {
   EventCard,
-  EventHomePost,
+  EventPost,
   EventTag,
-  findEventTagId,
-  mapRelatedToEventCards,
+  mapPostsToEventCards,
 } from "@/src/lib/eventHomeHelpers";
+
 import WatchCursor from "@/components/ui/WatchCursor";
-import { postsAPI } from "@/src/api/posts";
 
 type BannerVideoResponse = {
   key: string;
@@ -62,13 +62,18 @@ export default function Home() {
     (async () => {
       try {
         setLoadingMenu(true);
+
         const resMenu = (await menuAPI.getAll()) as MenuResponse;
+
         if (!mounted) return;
+
         setMenu(resMenu);
       } catch (e) {
         console.error("Failed to load menu", e);
       } finally {
-        if (mounted) setLoadingMenu(false);
+        if (mounted) {
+          setLoadingMenu(false);
+        }
       }
     })();
 
@@ -84,7 +89,8 @@ export default function Home() {
       try {
         setLoadingHomeSections(true);
 
-        const bannerRes = (await homeAPI.getAllBanerVideo()) as BannerVideoResponse[];
+        const bannerRes =
+          (await homeAPI.getAllBanerVideo()) as BannerVideoResponse[];
 
         if (!mounted) return;
 
@@ -105,7 +111,9 @@ export default function Home() {
       } catch (e) {
         console.error("Failed to load home sections", e);
       } finally {
-        if (mounted) setLoadingHomeSections(false);
+        if (mounted) {
+          setLoadingHomeSections(false);
+        }
       }
     })();
 
@@ -122,18 +130,31 @@ export default function Home() {
         setLoadingEvents(true);
 
         const tags = (await tagsAPI.getEvent()) as EventTag[];
-        const tagId = tags[0].id;
+        const tagId = tags?.[0]?.id;
 
-        if (!tagId) return;
+        if (!tagId) {
+          if (mounted) {
+            setEventItems([]);
+          }
 
-        const posts = (await postsAPI.getEventHome(tagId)) as EventHomePost[];
+          return;
+        }
+
+        const posts = (await postsAPI.getEventHome(tagId)) as EventPost[];
+
         if (!mounted) return;
 
-        setEventItems(mapRelatedToEventCards(posts, 3));
+        setEventItems(mapPostsToEventCards(posts, 3));
       } catch (e) {
         console.error("Failed to load event section", e);
+
+        if (mounted) {
+          setEventItems([]);
+        }
       } finally {
-        if (mounted) setLoadingEvents(false);
+        if (mounted) {
+          setLoadingEvents(false);
+        }
       }
     })();
 
@@ -149,8 +170,10 @@ export default function Home() {
     const flat = flattenMenu(tree);
 
     const importantItems = flat
-      .filter((i) => i.important === true)
-      .filter((i) => typeof i.banner_image === "string" && i.banner_image);
+      .filter((item) => item.important === true)
+      .filter(
+        (item) => typeof item.banner_image === "string" && item.banner_image
+      );
 
     const mapped: (HeroSlide & { order?: number })[] = importantItems.map(
       (item) => ({
@@ -160,7 +183,7 @@ export default function Home() {
         description: item.description || "",
         link: pickHref(item) || "",
         order: item.order,
-      }),
+      })
     );
 
     return sortByOrder(mapped).slice(0, 10);
@@ -196,6 +219,7 @@ export default function Home() {
       />
 
       <Category items={buildCategoryCardsFromMenu(menu)} />
+
       <Event items={eventItems} />
     </div>
   );
