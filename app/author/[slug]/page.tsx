@@ -1,7 +1,36 @@
 // app/author/[slug]/page.tsx
+import { Metadata } from "next";
 import AuthorHero from "@/components/author/AuthorHero";
 import AuthorPostList from "@/components/author/AuthorPostList";
 import { authorAPI } from "@/src/api/author";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const usersRes = await authorAPI.getUserBySlug(slug);
+  const user = Array.isArray(usersRes) ? usersRes[0] ?? null : usersRes ?? null;
+
+  if (!user) return { title: "Author" };
+
+  const yoast = user.yoast_head_json;
+
+  return {
+    title: yoast?.title || user.name,
+    description: yoast?.description || user.description,
+    openGraph: {
+      title: yoast?.og_title || user.name,
+      description: yoast?.og_description || user.description,
+      images: yoast?.og_image?.map((img: any) => ({
+        url: img.url,
+        width: img.width,
+        height: img.height,
+      })),
+    },
+  };
+}
 import {
   filterPostsByCategory,
   getAuthorCategories,

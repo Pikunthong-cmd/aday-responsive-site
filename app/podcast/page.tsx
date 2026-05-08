@@ -1,7 +1,31 @@
+import { Metadata } from "next";
 import HeroCategory from "@/components/layout/HeroCategory";
 import SectionContainer from "@/components/layout/SectionContainer";
 import PodcastSection from "@/components/podcast/Podcast";
 import { categoryFeedAPI } from "@/src/api/category-feed";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const catRes = await categoryFeedAPI.getCategoryBySlug("podcast");
+  const category = Array.isArray(catRes) ? catRes?.[0] : catRes;
+
+  if (!category) return { title: "Podcast" };
+
+  const yoast = category.yoast_head_json;
+
+  return {
+    title: yoast?.title || category.name,
+    description: yoast?.description || `Listen to a day magazine podcasts.`,
+    openGraph: {
+      title: yoast?.og_title || category.name,
+      description: yoast?.og_description,
+      images: yoast?.og_image?.map((img: any) => ({
+        url: img.url,
+        width: img.width,
+        height: img.height,
+      })),
+    },
+  };
+}
 
 function formatCategoryTitle(name: string) {
   const hasThai = /[\u0E00-\u0E7F]/.test(name);

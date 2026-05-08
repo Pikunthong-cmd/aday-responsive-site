@@ -20,5 +20,10 @@ export const postsAPI = {
     const res = await adayApiClientV2.get(`posts?slug=${slug}`);
     return res.data;
   },
+
+  getSitemapPosts: async (limit = 100) => {
+    const res = await adayApiClientV2.get(`posts?per_page=${limit}&_fields=slug,date,modified`);
+    return res.data;
+  },
   
 };
