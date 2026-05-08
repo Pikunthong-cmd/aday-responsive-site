@@ -1,5 +1,11 @@
+import { Metadata } from "next";
 import { IconAboutUs } from "@/components/Icon";
 import HeroStatic from "@/components/layout/HeroStatic";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description: "Learn more about a day magazine - creative magazine for curious people since 2000.",
+};
 
 export default function AboutUsPage() {
   return (

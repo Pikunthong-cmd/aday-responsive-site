@@ -136,7 +136,6 @@ export default function Home() {
           if (mounted) {
             setEventItems([]);
           }
-
           return;
         }
 

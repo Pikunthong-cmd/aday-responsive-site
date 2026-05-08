@@ -1,9 +1,55 @@
+import { Metadata } from "next";
 import ColumnBodyLayout from "@/components/column/ColumnBodyLayout";
 import ColumnHeroCover from "@/components/column/ColumnHeroCover";
 import DetailsAndShare from "@/components/DetailsAndShare";
 import DetailsPost from "@/components/DetailsPost";
 import RelatedPosts from "@/components/ui/RelatedPosts";
 import { postsAPI } from "@/src/api/posts";
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await props.params;
+  const res = await postsAPI.getPostBySlug(slug);
+  const post = Array.isArray(res) ? res[0] : res;
+
+  if (!post) {
+    return {
+      title: "Post Not Found",
+    };
+  }
+
+  const yoast = post.yoast_head_json;
+
+  return {
+    title: yoast?.title || post.title?.rendered,
+    description: yoast?.description || "",
+    alternates: {
+      canonical: yoast?.canonical || `/${slug}`,
+    },
+    openGraph: {
+      title: yoast?.og_title || yoast?.title || post.title?.rendered,
+      description: yoast?.og_description || yoast?.description || "",
+      url: yoast?.og_url || `/${slug}`,
+      siteName: yoast?.og_site_name || "a day magazine",
+      type: "article",
+      publishedTime: yoast?.article_published_time,
+      modifiedTime: yoast?.article_modified_time,
+      authors: yoast?.author ? [yoast.author] : [],
+      images: yoast?.og_image?.map((img: any) => ({
+        url: img.url,
+        width: img.width,
+        height: img.height,
+      })),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: yoast?.og_title || yoast?.title || post.title?.rendered,
+      description: yoast?.og_description || yoast?.description || "",
+      images: yoast?.og_image?.[0]?.url ? [yoast.og_image[0].url] : [],
+    },
+  };
+}
 
 function formatDMY(input?: string) {
   if (!input) return "";
@@ -208,8 +254,28 @@ export default async function PostPage(props: {
     (x) => x.postHref !== `/${slug}`,
   );
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: title,
+    image: imageUrl,
+    datePublished: post?.date,
+    dateModified: post?.modified,
+    author: [
+      {
+        "@type": "Person",
+        name: author,
+        url: `https://adaymagazine.com${authorHref}`,
+      },
+    ],
+  };
+
   return (
     <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ColumnHeroCover imageUrl={imageUrl} title={title} />
       <DetailsAndShare
         date={date}
